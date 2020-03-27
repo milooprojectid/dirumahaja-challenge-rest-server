@@ -45,3 +45,15 @@ export interface Emblem extends Model {
     name: string;
     img_url: string;
 }
+
+export interface Notification extends Model {
+    user_id: string;
+    text: string;
+    img_url: string;
+}
+
+export interface Punishment extends Model {
+    name: string;
+    text: string;
+    img_url: string;
+}
