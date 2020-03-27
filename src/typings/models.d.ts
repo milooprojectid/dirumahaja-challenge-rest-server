@@ -39,3 +39,9 @@ export interface UserEmblem extends Model {
     emblem_code: string;
     is_active: boolean;
 }
+
+export interface Emblem extends Model {
+    code: string;
+    name: string;
+    img_url: string;
+}
