@@ -33,3 +33,9 @@ export interface Relation extends Model {
     user_id: string;
     challenger_id: string;
 }
+
+export interface UserEmblem extends Model {
+    user_id: string;
+    emblem_code: string;
+    is_active: boolean;
+}

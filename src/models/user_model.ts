@@ -57,6 +57,21 @@ export default function(sequelize: any, dataTypes: any): any {
             sourceKey: 'id',
             as: 'active_session'
         });
+        user.hasMany(models.Relation, {
+            foreignKey: 'user_id',
+            sourceKey: 'id',
+            as: 'relations'
+        });
+        user.hasMany(models.UserEmblem, {
+            foreignKey: 'user_id',
+            sourceKey: 'id',
+            as: 'emblems'
+        });
+        user.hasOne(models.UserEmblem, {
+            foreignKey: 'user_id',
+            sourceKey: 'id',
+            as: 'active_emblem'
+        });
     };
 
     return user;
