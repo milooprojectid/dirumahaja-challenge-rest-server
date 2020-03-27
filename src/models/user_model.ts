@@ -1,5 +1,5 @@
 export default function(sequelize: any, dataTypes: any): any {
-    const member = sequelize.define(
+    const user = sequelize.define(
         'User',
         {
             id: {
@@ -46,12 +46,18 @@ export default function(sequelize: any, dataTypes: any): any {
         }
     );
 
-    member.associate = (models: any): void => {
-        // Member.belongsTo(models.model_name, {
-        //     foreignKey: 'model_name_id',
-        //     targetKey: 'id'
-        // });
+    user.associate = (models: any): void => {
+        user.hasMany(models.Session, {
+            foreignKey: 'user_id',
+            sourceKey: 'id',
+            as: 'sessions'
+        });
+        user.hasOne(models.Session, {
+            foreignKey: 'user_id',
+            sourceKey: 'id',
+            as: 'active_session'
+        });
     };
 
-    return member;
+    return user;
 }
