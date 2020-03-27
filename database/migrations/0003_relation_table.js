@@ -1,6 +1,6 @@
 'use strict';
 
-const tableName = 'logs';
+const tableName = 'relations';
 
 module.exports = {
     up: (queryInterface, dataTypes) => queryInterface.createTable(tableName, {
@@ -10,17 +10,12 @@ module.exports = {
             allowNull: false,
             primaryKey: true
         },
-        session_id: {
+        user_id: {
             type: dataTypes.STRING(255),
             allowNull: false
         },
-        coordinate: {
-            type: dataTypes.GEOMETRY('POINT'),
-            allowNull: false
-        },
-        status: {
-            type: dataTypes.INTEGER,
-            defaultValue: 20,
+        challenger_id: {
+            type: dataTypes.STRING(255),
             allowNull: false
         },
         created_at: {

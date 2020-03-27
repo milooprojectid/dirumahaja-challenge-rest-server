@@ -28,3 +28,8 @@ export interface Log extends Model {
     coordinate: string;
     status: number;
 }
+
+export interface Relation extends Model {
+    user_id: string;
+    challenger_id: string;
+}
