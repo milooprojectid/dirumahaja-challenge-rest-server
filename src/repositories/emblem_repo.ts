@@ -1,9 +1,9 @@
 import SQLRepo from './base/sql_repository';
 import { IContext } from 'src/typings/common';
-import { User } from '../typings/models';
+import { Emblem } from '../typings/models';
 
-export default class UserRepository extends SQLRepo<User> {
+export default class UserRepository extends SQLRepo<Emblem> {
     public constructor(context?: IContext) {
-        super('User', context);
+        super('Emblem', context);
     }
 }
