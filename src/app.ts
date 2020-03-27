@@ -11,6 +11,8 @@ import ProfileController from './controllers/profile_controller';
 import ExceptionHandler from './middlewares/exception';
 import NotFoundHandler from './middlewares/not_found';
 
+import ApiGuard from './middlewares/guard';
+
 class App {
     private app: Application;
     private port: number = 3000;
@@ -43,6 +45,7 @@ class App {
         this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.use(helmet());
         this.app.use(cors());
+        this.app.use(ApiGuard);
     }
 
     private setupExceptionHandlers(): void {

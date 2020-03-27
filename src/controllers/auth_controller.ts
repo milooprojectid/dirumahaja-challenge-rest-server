@@ -1,46 +1,65 @@
-import { HttpError } from 'tymon';
+import { HttpError, DBContext } from 'tymon';
 
-import JWT, { validatePassword } from '../libs/jwt';
 import Validator from '../middlewares/request_validator';
 import BaseController from './base/base_controller';
 import { IContext, IData, IHandlerOutput } from '../typings/common';
-import { LoginHandlerInput } from 'src/typings/methods/auth';
+import { Registerpayload } from 'src/typings/method';
+import { userCreatePayload, userEmblemCreatePayload, relationCreatepayload } from '../utils/transformer';
+import SessionService from '../services/session_service';
 import UserRepository from '../repositories/user_repo';
+import RelationRepository from '../repositories/relation_repo';
+import EmblemRepository from '../repositories/user_emblem_repo';
 
 export default class AuthController extends BaseController {
-    public async login(data: IData, context: IContext): Promise<IHandlerOutput> {
+    public async register(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
-            const {
-                body: { username, password }
-            }: LoginHandlerInput = data;
+            await DBContext.startTransaction();
+
+            const { body }: Registerpayload = data;
 
             const userRepo = new UserRepository();
-            const user = await userRepo.findOne({ username });
+            const userEmblemRepo = new EmblemRepository();
+            const relationRepo = new RelationRepository();
 
-            if (!user) {
-                throw HttpError.NotAuthorized(null, 'CREDENTIAL_NOT_MATCH');
+            /** check id uid or username already exist */
+            const [user, username] = await Promise.all([
+                userRepo.findOne({ id: body.uid }),
+                userRepo.findOne({ username: body.username })
+            ]);
+
+            if (user || username) {
+                throw HttpError.BadRequest(null, 'USER_ALREADY_EXIST');
             }
 
-            if (!validatePassword(password, user.password)) {
-                throw HttpError.NotAuthorized(null, 'CREDENTIAL_NOT_MATCH');
+            /** generate new user */
+            const payload = userCreatePayload(data);
+            await userRepo.create(payload);
+
+            /** generate relation */
+            if (body.challenger) {
+                await relationRepo.create(relationCreatepayload(body.uid, body.challenger));
             }
 
-            const token = JWT.generateToken({ user_id: username });
+            /** initialize session */
+            await SessionService.initializeNewSession(body.uid);
+
+            /** generate user emblem */
+            await userEmblemRepo.create(userEmblemCreatePayload(body.uid));
+
+            await DBContext.commit();
 
             return {
-                message: 'authentication success',
-                data: {
-                    token,
-                    expires_in: Number(process.env.JWT_LIFETIME)
-                }
+                message: 'registration success',
+                data: {}
             };
         } catch (err) {
+            await DBContext.rollback();
             if (err.status) throw err;
             throw HttpError.InternalServerError(err.message);
         }
     }
 
     public setRoutes(): void {
-        this.addRoute('post', '/login', this.login, Validator('login'));
+        this.addRoute('post', '/register', this.register, Validator('register'));
     }
 }

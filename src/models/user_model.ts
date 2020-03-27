@@ -58,7 +58,7 @@ export default function(sequelize: any, dataTypes: any): any {
             as: 'active_session'
         });
         user.hasMany(models.Relation, {
-            foreignKey: 'user_id',
+            foreignKey: 'challenger_id',
             sourceKey: 'id',
             as: 'relations'
         });

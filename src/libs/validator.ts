@@ -2,11 +2,29 @@ import * as Joi from '@hapi/joi';
 import { HttpError } from 'tymon';
 import { COMMON_ERRORS } from '../utils/constant';
 
+const COOR_REGEX = /^([-+]?)([\d]{1,2})(((\.)(\d+)(,)))(\s*)(([-+]?)([\d]{1,3})((\.)(\d+))?)$/;
+
 const schemas: { [s: string]: Joi.ObjectSchema } = {
-    login: Joi.object({
+    register: Joi.object({
         body: Joi.object({
-            username: Joi.string().required(),
-            password: Joi.string().required()
+            uid: Joi.string().required(),
+            username: Joi.string()
+                .min(4)
+                .max(20)
+                .required(),
+            age: Joi.number()
+                .integer()
+                .positive()
+                .optional(),
+            gender: Joi.string()
+                .valid('m', 'f')
+                .optional(),
+            coordinate: Joi.string()
+                .regex(COOR_REGEX)
+                .required(),
+            challenger: Joi.string()
+                .max(255)
+                .optional()
         }).required()
     })
 };

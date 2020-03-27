@@ -18,9 +18,9 @@ export interface Session extends Model {
     status: number;
     days: number;
     start_time: string;
-    end_time: string;
-    next_log: string;
-    punishment: string;
+    end_time: string | null;
+    next_log: string | null;
+    punishment: string | null;
 }
 
 export interface Log extends Model {
