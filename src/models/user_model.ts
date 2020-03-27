@@ -72,6 +72,11 @@ export default function(sequelize: any, dataTypes: any): any {
             sourceKey: 'id',
             as: 'active_emblem'
         });
+        user.hasMany(models.Notification, {
+            foreignKey: 'user_id',
+            sourceKey: 'id',
+            as: 'notifications'
+        });
     };
 
     return user;
