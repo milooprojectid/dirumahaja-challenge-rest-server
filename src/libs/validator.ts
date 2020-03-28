@@ -35,6 +35,11 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
         params: Joi.object({
             id: Joi.string().required()
         }).required()
+    }),
+    setPunishment: Joi.object({
+        body: Joi.object({
+            punishment: Joi.string().min(5).max(100).required()
+        }).required()
     })
 };
 

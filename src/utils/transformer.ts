@@ -59,6 +59,7 @@ export const profileOutput = (user: User, emblem: UserEmblem, session: Session):
         session_day: session.days,
         session_health: session.health,
         session_status: session.status,
+        session_punishment: session.punishment,
         emblem_img_url: emblem.emblem?.img_url,
         emblem_name: emblem.emblem?.name
     };

@@ -1,4 +1,4 @@
-import { HttpError, DBContext } from 'tymon';
+import { HttpError } from 'tymon';
 import * as moment from 'moment';
 import { getDistance } from 'geolib';
 
@@ -6,14 +6,15 @@ import Validator from '../middlewares/request_validator';
 import BaseController from './base/base_controller';
 import AuthMiddleware from '../middlewares/firebase';
 import { IContext, IData, IHandlerOutput } from '../typings/common';
-import { CheckinPayload } from 'src/typings/method';
+import { CheckinPayload, SetSessionPunishmentPayload } from 'src/typings/method';
 import SessionService from '../services/session_service';
 import UserService from '../services/user_service';
 import { parseCoordinate2 } from '../utils/helpers';
-import { MAX_HOME_RADIUS } from '../utils/constant';
+import { MAX_HOME_RADIUS, SESSION_STATUS } from '../utils/constant';
 
 import PunishmentRepository from '../repositories/punishment_repo';
 import RedisRepo from '../repositories/base/redis_repository';
+import SessionRepository from '../repositories/session_repo';
 
 export default class SessionController extends BaseController {
     public constructor() {
@@ -92,8 +93,31 @@ export default class SessionController extends BaseController {
         }
     }
 
+    public async setSessionPunishment(data: IData, context: IContext): Promise<IHandlerOutput> {
+        try {
+            const { body }: SetSessionPunishmentPayload = data;
+
+            const sessionRepo = new SessionRepository();
+            const session = await SessionService.getActiveSession(context.user_id);
+            if (session.status != SESSION_STATUS.CLOSED) {
+                throw HttpError.BadRequest(null, 'SESSION_NOT_ELIGIBLE');
+            }
+
+            await sessionRepo.update({ id: session.id }, { punishment: body.punishment });
+
+            return {
+                message: 'session punishment updated',
+                data: null
+            };
+        } catch (err) {
+            if (err.status) throw err;
+            throw HttpError.InternalServerError(err.message);
+        }
+    }
+
     public setRoutes(): void {
         this.addRoute('post', '/checkin', this.checkin, Validator('checkin'));
         this.addRoute('get', '/punishments', this.getPunishments);
+        this.addRoute('post', '/punishments', this.setSessionPunishment, Validator('setPunishment'));
     }
 }

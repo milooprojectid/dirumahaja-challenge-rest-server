@@ -21,3 +21,9 @@ export interface CheckinPayload {
         next_checkin: string;
     };
 }
+
+export interface SetSessionPunishmentPayload {
+    body: {
+        punishment: string;
+    };
+}
