@@ -30,6 +30,11 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
             coordinate: Joi.string().regex(COOR_REGEX).required(),
             next_checkin: Joi.string().isoDate().allow('', null).optional()
         }).required()
+    }),
+    setEmblem: Joi.object({
+        params: Joi.object({
+            id: Joi.string().required()
+        }).required()
     })
 };
 

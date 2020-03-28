@@ -14,6 +14,7 @@ import NotFoundHandler from './middlewares/not_found';
 
 import ApiGuard from './middlewares/guard';
 import RateLimiter from './middlewares/ratelimiter';
+import EmblemContoller from './controllers/emblem_controller';
 
 class App {
     private app: Application;
@@ -33,6 +34,7 @@ class App {
         this.app.use('/auth', new AuthController().getRoutes());
         this.app.use('/profile', new ProfileController().getRoutes());
         this.app.use('/session', new SessionController().getRoutes());
+        this.app.use('/emblem', new EmblemContoller().getRoutes());
     }
 
     private setupModules(): void {

@@ -24,4 +24,21 @@ export default class UserEmblemRepository extends SQLRepo<UserEmblem> {
             attributes: ['id']
         });
     }
+
+    public async getAllUserEmblem(userId: string): Promise<UserEmblem[]> {
+        const db = await this.getDbInstance();
+        return db[this.model].findAll({
+            where: {
+                user_id: userId
+            },
+            include: [
+                {
+                    model: db.Emblem,
+                    as: 'emblem',
+                    attributes: ['code', 'name', 'img_url']
+                }
+            ],
+            attributes: ['id', 'is_active']
+        });
+    }
 }

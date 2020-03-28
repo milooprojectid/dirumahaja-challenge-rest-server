@@ -36,7 +36,7 @@ export default class AuthController extends BaseController {
             await userRepo.create(payload);
 
             /** generate relation */
-            if (body.challenger) {
+            if (body.challenger && body.challenger != body.username) {
                 const challenger = await userRepo.findOne({ username: body.challenger });
                 if (!challenger) {
                     throw HttpError.NotFound(null, 'CHALLENGER_NOT_FOUND');
