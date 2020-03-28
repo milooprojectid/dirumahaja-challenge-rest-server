@@ -103,10 +103,40 @@ export default class SessionController extends BaseController {
                 throw HttpError.BadRequest(null, 'SESSION_NOT_ELIGIBLE');
             }
 
-            await sessionRepo.update({ id: session.id }, { punishment: body.punishment });
+            await Promise.all([
+                sessionRepo.update({ id: session.id }, { punishment: body.punishment }),
+                UserService.bustProfileCache(context.user_id)
+            ]);
 
             return {
                 message: 'session punishment updated',
+                data: null
+            };
+        } catch (err) {
+            if (err.status) throw err;
+            throw HttpError.InternalServerError(err.message);
+        }
+    }
+
+    public async reInitiateSession(data: IData, context: IContext): Promise<IHandlerOutput> {
+        try {
+            const session = await SessionService.getActiveSession(context.user_id);
+
+            if (session.status != SESSION_STATUS.CLOSED) {
+                throw HttpError.BadRequest(null, 'SESSION_NOT_ELIGIBLE');
+            }
+
+            if (!session.punishment) {
+                throw HttpError.BadRequest(null, 'SESSION_PUNISHMENT_NOT_SET');
+            }
+
+            await Promise.all([
+                SessionService.initializeNewSession(context.user_id),
+                UserService.bustProfileCache(context.user_id)
+            ]);
+
+            return {
+                message: 'session restarted',
                 data: null
             };
         } catch (err) {
@@ -119,5 +149,6 @@ export default class SessionController extends BaseController {
         this.addRoute('post', '/checkin', this.checkin, Validator('checkin'));
         this.addRoute('get', '/punishments', this.getPunishments);
         this.addRoute('post', '/punishments', this.setSessionPunishment, Validator('setPunishment'));
+        this.addRoute('post', '/restart', this.reInitiateSession);
     }
 }
