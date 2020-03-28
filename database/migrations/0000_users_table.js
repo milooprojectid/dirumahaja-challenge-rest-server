@@ -27,6 +27,10 @@ module.exports = {
             type: dataTypes.GEOMETRY('POINT'),
             allowNull: false
         },
+        location_name: {
+            type: dataTypes.STRING(255),
+            allowNull: true
+        },
         created_at: {
             type: dataTypes.DATE,
             allowNull: true

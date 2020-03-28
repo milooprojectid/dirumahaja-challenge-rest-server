@@ -1,4 +1,4 @@
-export default function(sequelize: any, dataTypes: any): any {
+export default function (sequelize: any, dataTypes: any): any {
     const userEmblem = sequelize.define(
         'UserEmblem',
         {
@@ -48,8 +48,8 @@ export default function(sequelize: any, dataTypes: any): any {
             as: 'user'
         });
         userEmblem.belongsTo(models.Emblem, {
-            foreignKey: 'emblem_id',
-            targetKey: 'id',
+            foreignKey: 'emblem_code',
+            targetKey: 'code',
             as: 'emblem'
         });
     };

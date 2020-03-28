@@ -19,6 +19,11 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
         body: Joi.object({
             username: Joi.string().min(4).max(20).required()
         }).required()
+    }),
+    profile: Joi.object({
+        query: Joi.object({
+            cache: Joi.boolean().default(true)
+        }).required()
     })
 };
 

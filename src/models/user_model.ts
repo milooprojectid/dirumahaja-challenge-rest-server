@@ -1,4 +1,4 @@
-export default function(sequelize: any, dataTypes: any): any {
+export default function (sequelize: any, dataTypes: any): any {
     const user = sequelize.define(
         'User',
         {
@@ -24,6 +24,10 @@ export default function(sequelize: any, dataTypes: any): any {
             coordinate: {
                 type: dataTypes.GEOMETRY('POINT'),
                 allowNull: false
+            },
+            location_name: {
+                type: dataTypes.STRING(255),
+                allowNull: true
             },
             created_at: {
                 type: dataTypes.DATE,

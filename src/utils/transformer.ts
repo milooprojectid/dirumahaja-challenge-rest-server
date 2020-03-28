@@ -1,9 +1,9 @@
 import { Registerpayload } from 'src/typings/method';
-import { Session, UserEmblem, Relation } from 'src/typings/models';
+import { Session, UserEmblem, Relation, User } from 'src/typings/models';
 import { timestamp } from './helpers';
 import { SESSION_STATUS, EMBLEM_CODE } from './constant';
 
-export const userCreatePayload = ({ body: data }: Registerpayload): any => {
+export const userCreatePayload = ({ body: data }: Registerpayload): Partial<User> => {
     const [lat, lng] = data.coordinate.split(',').map((item: string): number => +item.trim());
 
     return {
@@ -11,7 +11,8 @@ export const userCreatePayload = ({ body: data }: Registerpayload): any => {
         username: data.username,
         age: data.age,
         gender: data.gender,
-        coordinate: { type: 'Point', coordinates: [lat, lng] }
+        coordinate: { type: 'Point', coordinates: [lat, lng] },
+        location_name: null
     };
 };
 
@@ -44,5 +45,19 @@ export const relationCreatepayload = (userId: string, challengerId: string): Par
     return {
         user_id: userId,
         challenger_id: challengerId
+    };
+};
+
+export const profile = (user: User, emblem: UserEmblem, session: Session): any => {
+    return {
+        username: user.username,
+        age: user.age,
+        gender: user.gender,
+        coordinate: `${user.coordinate.coordinates}`,
+        location_name: user.location_name,
+        session_day: session.days,
+        session_health: session.health,
+        emblem_img_url: emblem.emblem?.img_url,
+        emblem_name: emblem.emblem?.name
     };
 };

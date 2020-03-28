@@ -8,3 +8,9 @@ export interface Registerpayload {
         challenger: string;
     };
 }
+
+export interface GetProfilePayload {
+    query: {
+        cache: boolean;
+    };
+}

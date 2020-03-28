@@ -5,11 +5,17 @@ export interface Model {
     deleted_at: string;
 }
 
+export interface Coordinate {
+    type: string;
+    coordinates: number[];
+}
+
 export interface User extends Model {
     username: string;
-    age: number;
-    gender: string;
-    coordinate: string;
+    age: number | null;
+    gender: string | null;
+    coordinate: Coordinate;
+    location_name: string | null;
 }
 
 export interface Session extends Model {
@@ -25,7 +31,7 @@ export interface Session extends Model {
 
 export interface Log extends Model {
     session_id: string;
-    coordinate: string;
+    coordinate: Coordinate;
     status: number;
 }
 
@@ -38,6 +44,8 @@ export interface UserEmblem extends Model {
     user_id: string;
     emblem_code: string;
     is_active: boolean;
+
+    emblem?: Emblem;
 }
 
 export interface Emblem extends Model {
