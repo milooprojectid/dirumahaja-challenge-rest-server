@@ -12,6 +12,7 @@ import ExceptionHandler from './middlewares/exception';
 import NotFoundHandler from './middlewares/not_found';
 
 import ApiGuard from './middlewares/guard';
+import RateLimiter from './middlewares/ratelimiter';
 
 class App {
     private app: Application;
@@ -21,8 +22,8 @@ class App {
         this.app = express();
         this.port = port;
 
-        this.setupPlugins();
         this.setupModules();
+        this.setupPlugins();
         this.setupControllers();
         this.setupExceptionHandlers();
     }
@@ -51,6 +52,7 @@ class App {
         this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.use(helmet());
         this.app.use(cors());
+        this.app.use(RateLimiter);
         this.app.use(ApiGuard);
     }
 

@@ -14,6 +14,7 @@ RUN npm ci --only=production --quiet
 RUN cp -a ./node_modules ./build
 RUN cp -a ./storage ./build
 RUN cp ./.env ./build
+RUN cp ./firebase-service-account.json ./build
 
 # release
 FROM node:10-alpine as release
