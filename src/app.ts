@@ -52,7 +52,7 @@ class App {
         this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.use(helmet());
         this.app.use(cors());
-        this.app.use(RateLimiter);
+        this.app.use(RateLimiter());
         this.app.use(ApiGuard);
     }
 
