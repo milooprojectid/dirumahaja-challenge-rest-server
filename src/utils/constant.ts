@@ -11,6 +11,11 @@ export const SESSION_STATUS = {
     CLOSED: 30
 };
 
+export const LOG_STATUS = {
+    VALID: 20,
+    INVALID: 30
+};
+
 export const EMBLEM_CODE = {
     HERO_ONE: 'HERO_ONE',
     HERO_TWO: 'HERO_TWO',
@@ -32,3 +37,5 @@ export const NOTIFICATION = {
         text: 'Yesss! Kamu menang Challenge melawan username. Jangan lupa tagih hadiah mu'
     }
 };
+
+export const MAX_HOME_RADIUS = 500;

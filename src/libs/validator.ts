@@ -24,6 +24,12 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
         query: Joi.object({
             cache: Joi.boolean().default(true)
         }).required()
+    }),
+    checkin: Joi.object({
+        body: Joi.object({
+            coordinate: Joi.string().regex(COOR_REGEX).required(),
+            next_checkin: Joi.string().isoDate().allow('', null).optional()
+        }).required()
     })
 };
 

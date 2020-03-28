@@ -1,8 +1,18 @@
 import { HttpError } from 'tymon';
+import * as moment from 'moment';
+import * as bluebird from 'bluebird';
+
 import SessionRepository from '../repositories/session_repo';
-import { SESSION_STATUS } from '../utils/constant';
+import { SESSION_STATUS, LOG_STATUS, NOTIFICATION } from '../utils/constant';
 import { initSessionPayload } from '../utils/transformer';
 import { Session } from 'src/typings/models';
+import UserService from './user_service';
+import { sendToTopic } from '../utils/notification';
+import { parseCoordinate, timestamp } from '../utils/helpers';
+
+import LogRepository from '../repositories/log_repo';
+import RelationRepository from '../repositories/relation_repo';
+import NotificationRepository from '../repositories/notification_repo';
 
 export default class SessionService {
     public static async initializeNewSession(userId: string): Promise<void> {
@@ -13,6 +23,7 @@ export default class SessionService {
             const payload = initSessionPayload(userId);
             await sessionRepo.create(payload);
         } catch (err) {
+            if (err.status) throw err;
             throw HttpError.InternalServerError(`fail generating new session, ${err.message}`);
         }
     }
@@ -22,11 +33,104 @@ export default class SessionService {
             const sessionRepo = new SessionRepository();
             const session = await sessionRepo.findOne({ user_id: userId, status: SESSION_STATUS.ON_GOING });
             if (!session) {
-                throw HttpError.NotFound('not active session found');
+                throw HttpError.NotFound('no active session found');
             }
             return session;
         } catch (err) {
+            if (err.status) throw err;
             throw HttpError.InternalServerError(`fail generating new session, ${err.message}`, 'SESSION_ERROR');
+        }
+    }
+
+    public static async hitted(session: Session, log: { coordinate: string; next_log: string }): Promise<void> {
+        try {
+            const sessionRepo = new SessionRepository();
+            const relationRepo = new RelationRepository();
+            const notifRepo = new NotificationRepository();
+            const logRepo = new LogRepository();
+
+            const newHealth = session.health - 1;
+            const days = Math.abs(moment(session.start_time).diff(moment(), 'days'));
+
+            const payload: { [s: string]: any } = { health: newHealth, next_log: log.next_log || null, days };
+            if (newHealth <= 0) {
+                payload.status = SESSION_STATUS.CLOSED;
+                payload.end_time = timestamp();
+            }
+
+            /** give health to every friends */
+            const coordinate = parseCoordinate(log.coordinate);
+            await bluebird.all([
+                sessionRepo.update({ id: session.id }, payload),
+                logRepo.create({
+                    session_id: session.id,
+                    coordinate: { type: 'Point', coordinates: coordinate },
+                    status: LOG_STATUS.VALID
+                }),
+                UserService.bustProfileCache(session.user_id),
+                notifRepo.create({
+                    user_id: session.user_id,
+                    text: NOTIFICATION.LOSE.text,
+                    img_url: NOTIFICATION.LOSE.icon
+                }),
+                sendToTopic({
+                    topic: session.user_id,
+                    data: NOTIFICATION.LOSE,
+                    notification: { title: 'Oh tidaak, kamu kalah' }
+                })
+            ]);
+
+            /** notification */
+            const relations = await relationRepo.findAll({ challenger_id: session.user_id });
+            await bluebird.map(
+                relations,
+                (relation): any =>
+                    notifRepo
+                        .create({
+                            user_id: relation.user_id,
+                            text: NOTIFICATION.WIN.text,
+                            img_url: NOTIFICATION.WIN.icon
+                        })
+                        .then((): any =>
+                            sessionRepo.increment(
+                                { user_id: relation.user_id, status: SESSION_STATUS.ON_GOING },
+                                'health'
+                            )
+                        )
+                        .then((): any =>
+                            sendToTopic({
+                                topic: relation.user_id,
+                                data: NOTIFICATION.WIN,
+                                notification: { title: 'Yuhuu, kamu mendapatkan nyawa' }
+                            })
+                        ),
+                { concurrency: 5 }
+            );
+        } catch (err) {
+            console.error(err.message);
+        }
+    }
+
+    public static async avoided(session: Session, log: { coordinate: string; next_log: string }): Promise<void> {
+        try {
+            const sessionRepo = new SessionRepository();
+            const logRepo = new LogRepository();
+
+            const coordinate = parseCoordinate(log.coordinate);
+            const days = Math.abs(moment(session.start_time).diff(moment(), 'days'));
+
+            await Promise.all([
+                sessionRepo.update({ id: session.id }, { days: days, next_log: log.next_log || null }),
+                logRepo.create({
+                    session_id: session.id,
+                    coordinate: { type: 'Point', coordinates: coordinate },
+                    status: LOG_STATUS.VALID
+                })
+            ]);
+
+            await UserService.bustProfileCache(session.user_id);
+        } catch (err) {
+            console.error(err.message);
         }
     }
 }

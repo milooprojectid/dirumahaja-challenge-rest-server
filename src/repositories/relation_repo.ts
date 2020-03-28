@@ -3,7 +3,7 @@ import { IContext } from 'src/typings/common';
 import { Relation } from '../typings/models';
 import { SESSION_STATUS } from '../utils/constant';
 
-export default class UserRepository extends SQLRepo<Relation> {
+export default class RelationRepository extends SQLRepo<Relation> {
     public constructor(context?: IContext) {
         super('Relation', context);
     }

@@ -1,10 +1,10 @@
-import { Registerpayload } from 'src/typings/method';
+import { RegisterPayload } from 'src/typings/method';
 import { Session, UserEmblem, Relation, User } from 'src/typings/models';
-import { timestamp } from './helpers';
+import { timestamp, parseCoordinate } from './helpers';
 import { SESSION_STATUS, EMBLEM_CODE } from './constant';
 
-export const userCreatePayload = ({ body: data }: Registerpayload): Partial<User> => {
-    const [lat, lng] = data.coordinate.split(',').map((item: string): number => +item.trim());
+export const userCreatePayload = ({ body: data }: RegisterPayload): Partial<User> => {
+    const [lat, lng] = parseCoordinate(data.coordinate);
 
     return {
         id: data.uid,

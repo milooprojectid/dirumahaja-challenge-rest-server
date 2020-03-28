@@ -61,6 +61,10 @@ export type MakeAny<T> = {
     [P in keyof T]?: any;
 };
 
+export declare type Complete<T> = {
+    [K in keyof T]-?: T[K];
+};
+
 export interface INotificationPayload {
     notification?: {
         title: string;

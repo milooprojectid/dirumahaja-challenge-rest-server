@@ -1,4 +1,4 @@
-export interface Registerpayload {
+export interface RegisterPayload {
     body: {
         uid: string;
         username: string;
@@ -12,5 +12,12 @@ export interface Registerpayload {
 export interface GetProfilePayload {
     query: {
         cache: boolean;
+    };
+}
+
+export interface CheckinPayload {
+    body: {
+        coordinate: string;
+        next_checkin: string;
     };
 }

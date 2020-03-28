@@ -38,10 +38,19 @@ export const sorter = (sort: string = '-created_at'): string[] => {
     return [sortString, sortMethod];
 };
 
-export const timestamp = (): string =>
-    moment()
-        .utc()
-        .toISOString();
+export const timestamp = (): string => moment().utc().toISOString();
+
+export const parseCoordinate = (coordinate: string): number[] => {
+    return coordinate.split(',').map((item: string): number => +item.trim());
+};
+
+export const parseCoordinate2 = (coordinate: string): { lat: number; lng: number } => {
+    const [lat, lng] = coordinate.split(',').map((item: string): number => +item.trim());
+    return {
+        lat,
+        lng
+    };
+};
 
 export default {
     parseDataObject,

@@ -3,7 +3,7 @@ import { HttpError, DBContext } from 'tymon';
 import Validator from '../middlewares/request_validator';
 import BaseController from './base/base_controller';
 import { IContext, IData, IHandlerOutput } from '../typings/common';
-import { Registerpayload } from 'src/typings/method';
+import { RegisterPayload } from 'src/typings/method';
 import { userCreatePayload, userEmblemCreatePayload, relationCreatepayload } from '../utils/transformer';
 import SessionService from '../services/session_service';
 import UserRepository from '../repositories/user_repo';
@@ -15,7 +15,7 @@ export default class AuthController extends BaseController {
         try {
             await DBContext.startTransaction();
 
-            const { body }: Registerpayload = data;
+            const { body }: RegisterPayload = data;
 
             const userRepo = new UserRepository();
             const userEmblemRepo = new EmblemRepository();
@@ -68,7 +68,7 @@ export default class AuthController extends BaseController {
 
     public async checkUsernameAvailability(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
-            const { body }: Registerpayload = data;
+            const { body }: RegisterPayload = data;
             const userRepo = new UserRepository();
 
             const userExist = await userRepo.findOne({ username: body.username });
