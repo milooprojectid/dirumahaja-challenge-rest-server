@@ -48,7 +48,7 @@ export const relationCreatepayload = (userId: string, challengerId: string): Par
     };
 };
 
-export const profile = (user: User, emblem: UserEmblem, session: Session): any => {
+export const profileOutput = (user: User, emblem: UserEmblem, session: Session): any => {
     return {
         username: user.username,
         age: user.age,
@@ -60,4 +60,15 @@ export const profile = (user: User, emblem: UserEmblem, session: Session): any =
         emblem_img_url: emblem.emblem?.img_url,
         emblem_name: emblem.emblem?.name
     };
+};
+
+export const relationsOutput = (relations: Relation[]): any[] => {
+    return relations.map((item): any => ({
+        username: item.challenger?.username,
+        location_name: item.challenger?.location_name,
+        session_day: item.challenger?.active_session?.days,
+        session_health: item.challenger?.active_session?.health,
+        emblem_img_url: item.challenger?.active_emblem?.emblem?.img_url,
+        emblem_name: item.challenger?.active_emblem?.emblem?.name
+    }));
 };

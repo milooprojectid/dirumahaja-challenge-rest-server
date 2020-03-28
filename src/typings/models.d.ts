@@ -16,6 +16,9 @@ export interface User extends Model {
     gender: string | null;
     coordinate: Coordinate;
     location_name: string | null;
+
+    active_session?: Session;
+    active_emblem?: UserEmblem;
 }
 
 export interface Session extends Model {
@@ -38,6 +41,8 @@ export interface Log extends Model {
 export interface Relation extends Model {
     user_id: string;
     challenger_id: string;
+
+    challenger?: User;
 }
 
 export interface UserEmblem extends Model {
