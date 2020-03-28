@@ -26,6 +26,7 @@ export interface Session extends Model {
     health: number;
     status: number;
     days: number;
+    is_active: boolean;
     start_time: string;
     end_time: string | null;
     next_log: string | null;

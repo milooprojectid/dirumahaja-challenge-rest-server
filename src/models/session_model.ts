@@ -1,4 +1,4 @@
-export default function(sequelize: any, dataTypes: any): any {
+export default function (sequelize: any, dataTypes: any): any {
     const session = sequelize.define(
         'Session',
         {
@@ -21,6 +21,10 @@ export default function(sequelize: any, dataTypes: any): any {
                 type: dataTypes.INTEGER,
                 defaultValue: 20,
                 allowNull: false
+            },
+            is_active: {
+                type: dataTypes.BOOLEAN,
+                defaultValue: true
             },
             days: {
                 type: dataTypes.INTEGER,

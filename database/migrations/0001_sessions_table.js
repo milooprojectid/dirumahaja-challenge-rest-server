@@ -24,6 +24,10 @@ module.exports = {
             defaultValue: 20,
             allowNull: false
         },
+        is_active: {
+            type: dataTypes.BOOLEAN,
+            defaultValue: true
+        },
         days: {
             type: dataTypes.INTEGER,
             defaultValue: 0,

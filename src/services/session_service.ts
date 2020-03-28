@@ -18,7 +18,7 @@ export default class SessionService {
     public static async initializeNewSession(userId: string): Promise<void> {
         try {
             const sessionRepo = new SessionRepository();
-            await sessionRepo.update({ user_id: userId }, { status: SESSION_STATUS.CLOSED });
+            await sessionRepo.update({ user_id: userId }, { status: SESSION_STATUS.CLOSED, is_active: false });
 
             const payload = initSessionPayload(userId);
             await sessionRepo.create(payload);
@@ -31,7 +31,7 @@ export default class SessionService {
     public static async getActiveSession(userId: string): Promise<Session> {
         try {
             const sessionRepo = new SessionRepository();
-            const session = await sessionRepo.findOne({ user_id: userId, status: SESSION_STATUS.ON_GOING });
+            const session = await sessionRepo.findOne({ user_id: userId, is_active: true });
             if (!session) {
                 throw HttpError.NotFound('no active session found');
             }

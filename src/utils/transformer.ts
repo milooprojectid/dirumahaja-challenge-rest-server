@@ -34,6 +34,7 @@ export const initSessionPayload = (userId: string): Partial<Session> => {
         days: 0,
         health: 1,
         start_time: timestamp(),
+        is_active: true,
         end_time: null,
         next_log: null,
         status: SESSION_STATUS.ON_GOING,
@@ -57,6 +58,7 @@ export const profileOutput = (user: User, emblem: UserEmblem, session: Session):
         location_name: user.location_name,
         session_day: session.days,
         session_health: session.health,
+        session_status: session.status,
         emblem_img_url: emblem.emblem?.img_url,
         emblem_name: emblem.emblem?.name
     };
@@ -68,6 +70,7 @@ export const relationsOutput = (relations: Relation[]): any[] => {
         location_name: item.challenger?.location_name,
         session_day: item.challenger?.active_session?.days,
         session_health: item.challenger?.active_session?.health,
+        session_status: item.challenger?.active_session?.status,
         emblem_img_url: item.challenger?.active_emblem?.emblem?.img_url,
         emblem_name: item.challenger?.active_emblem?.emblem?.name
     }));

@@ -6,6 +6,7 @@ import AuthMiddleware from '../middlewares/firebase';
 import UserRepository from '../repositories/user_repo';
 import RelationRepository from '../repositories/relation_repo';
 import UserEmblemRepository from '../repositories/user_emblem_repo';
+import NotificationRepository from '../repositories/notification_repo';
 import RedisRepository from '../repositories/base/redis_repository';
 import BaseController from './base/base_controller';
 import SessionService from '../services/session_service';
@@ -86,9 +87,28 @@ export default class ProfileController extends BaseController {
         }
     }
 
+    public async getNotification(data: IData, context: IContext): Promise<IHandlerOutput> {
+        try {
+            const notificationRepo = new NotificationRepository();
+            const notifications = await notificationRepo.findAll({ user_id: context.user_id });
+
+            return {
+                message: 'notification data retrieved',
+                data: notifications.map((item): any => ({
+                    text: item.text,
+                    img_url: item.img_url
+                }))
+            };
+        } catch (err) {
+            if (err.status) throw err;
+            throw HttpError.InternalServerError(err.message);
+        }
+    }
+
     protected setRoutes(): void {
         this.addRoute('get', '/', this.getProfile, Validator('profile'));
         this.addRoute('get', '/relation', this.getRelations, Validator('profile'));
+        this.addRoute('get', '/notification', this.getNotification);
 
         /** nested controllers */
         // this.addChildController(new Controller());
