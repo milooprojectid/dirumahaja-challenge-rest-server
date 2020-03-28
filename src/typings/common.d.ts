@@ -60,3 +60,12 @@ export interface IHttpOutput {
 export type MakeAny<T> = {
     [P in keyof T]?: any;
 };
+
+export interface INotificationPayload {
+    notification?: {
+        title: string;
+        body?: string;
+    };
+    data?: { [s: string]: string };
+    topic: string;
+}
