@@ -12,7 +12,8 @@ import UserService from '../services/user_service';
 import { parseCoordinate2 } from '../utils/helpers';
 import { MAX_HOME_RADIUS } from '../utils/constant';
 
-import LogRepository from '../repositories/log_repo';
+import PunishmentRepository from '../repositories/punishment_repo';
+import RedisRepo from '../repositories/base/redis_repository';
 
 export default class SessionController extends BaseController {
     public constructor() {
@@ -66,7 +67,33 @@ export default class SessionController extends BaseController {
         }
     }
 
+    public async getPunishments(data: IData, context: IContext): Promise<IHandlerOutput> {
+        try {
+            const punishmentRepo = new PunishmentRepository();
+            const redisRepo = new RedisRepo('general');
+
+            let punishments: any[] = await redisRepo.findOne('punishment');
+            if (!punishments) {
+                punishments = await punishmentRepo.findAll({}, 'id');
+                await redisRepo.create('punishment', punishments);
+            }
+
+            return {
+                message: 'punishments data retrieved',
+                data: punishments.map((item): any => ({
+                    name: item.name,
+                    text: item.text,
+                    img_url: item.img_url
+                }))
+            };
+        } catch (err) {
+            if (err.status) throw err;
+            throw HttpError.InternalServerError(err.message);
+        }
+    }
+
     public setRoutes(): void {
         this.addRoute('post', '/checkin', this.checkin, Validator('checkin'));
+        this.addRoute('get', '/punishments', this.getPunishments);
     }
 }

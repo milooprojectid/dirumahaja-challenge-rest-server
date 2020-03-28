@@ -12,6 +12,7 @@ import BaseController from './base/base_controller';
 import SessionService from '../services/session_service';
 import { profileOutput, relationsOutput } from '../utils/transformer';
 import { GetProfilePayload } from 'src/typings/method';
+import RedisRepo from '../repositories/base/redis_repository';
 
 export default class ProfileController extends BaseController {
     public constructor() {
@@ -90,7 +91,13 @@ export default class ProfileController extends BaseController {
     public async getNotification(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
             const notificationRepo = new NotificationRepository();
-            const notifications = await notificationRepo.findAll({ user_id: context.user_id });
+            const redisRepo = new RedisRepo('notification');
+
+            let notifications: any[] = await redisRepo.findOne(context.user_id);
+            if (!notifications) {
+                notifications = await notificationRepo.findAll({ user_id: context.user_id });
+                await redisRepo.create(context.user_id, notifications, 600);
+            }
 
             return {
                 message: 'notification data retrieved',
