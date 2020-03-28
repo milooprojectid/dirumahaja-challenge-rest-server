@@ -1,4 +1,5 @@
 import { HttpError } from 'tymon';
+import * as axios from 'axios';
 
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
 import Validator from '../middlewares/request_validator';
@@ -112,12 +113,31 @@ export default class ProfileController extends BaseController {
         }
     }
 
+    public async getCovidData(data: IData, context: IContext): Promise<IHandlerOutput> {
+        try {
+            const redisRepo = new RedisRepo('general');
+
+            let covidData: any = await redisRepo.findOne('covid');
+            if (!covidData) {
+                const { data: payload } = await axios.default.get('https://miloo-phoenix.firebaseio.com/covid-19.json');
+                covidData = payload;
+                redisRepo.create('covid', covidData, 100);
+            }
+
+            return {
+                message: 'covid-19 data retrieved',
+                data: covidData
+            };
+        } catch (err) {
+            if (err.status) throw err;
+            throw HttpError.InternalServerError(err.message);
+        }
+    }
+
     protected setRoutes(): void {
         this.addRoute('get', '/', this.getProfile, Validator('profile'));
         this.addRoute('get', '/relation', this.getRelations, Validator('profile'));
         this.addRoute('get', '/notification', this.getNotification);
-
-        /** nested controllers */
-        // this.addChildController(new Controller());
+        this.addRoute('get', '/covid', this.getCovidData);
     }
 }
