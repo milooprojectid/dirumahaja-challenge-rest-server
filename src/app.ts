@@ -1,4 +1,4 @@
-import { HttpError, DBContext } from 'tymon';
+import { HttpError, DBContext, FirebaseContext, RedisContext } from 'tymon';
 import { Application } from 'express';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
@@ -37,6 +37,12 @@ class App {
         DBContext.initialize({
             connection_string: String(process.env.DB_CONNECTION_STRING),
             models_path: '/src/models'
+        });
+        RedisContext.initialize({
+            connection_string: String(process.env.REDIS_CONNECTION_STRING)
+        });
+        FirebaseContext.initialize({
+            service_account_path: String(process.env.FIREBASE_SERVICE_ACCOUNT_PATH)
         });
     }
 
