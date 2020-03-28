@@ -59,7 +59,27 @@ export default class AuthController extends BaseController {
         }
     }
 
+    public async checkUsernameAvailability(data: IData, context: IContext): Promise<IHandlerOutput> {
+        try {
+            const { body }: Registerpayload = data;
+            const userRepo = new UserRepository();
+
+            const userExist = await userRepo.findOne({ username: body.username });
+
+            return {
+                message: 'check username success',
+                data: {
+                    is_exist: !!userExist
+                }
+            };
+        } catch (err) {
+            if (err.status) throw err;
+            throw HttpError.InternalServerError(err.message);
+        }
+    }
+
     public setRoutes(): void {
         this.addRoute('post', '/register', this.register, Validator('register'));
+        this.addRoute('post', '/check', this.checkUsernameAvailability, Validator('checkUsername'));
     }
 }

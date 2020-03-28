@@ -8,23 +8,16 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
     register: Joi.object({
         body: Joi.object({
             uid: Joi.string().required(),
-            username: Joi.string()
-                .min(4)
-                .max(20)
-                .required(),
-            age: Joi.number()
-                .integer()
-                .positive()
-                .optional(),
-            gender: Joi.string()
-                .valid('m', 'f')
-                .optional(),
-            coordinate: Joi.string()
-                .regex(COOR_REGEX)
-                .required(),
-            challenger: Joi.string()
-                .max(255)
-                .optional()
+            username: Joi.string().min(4).max(20).required(),
+            age: Joi.number().integer().positive().optional(),
+            gender: Joi.string().valid('m', 'f').optional(),
+            coordinate: Joi.string().regex(COOR_REGEX).required(),
+            challenger: Joi.string().max(255).optional()
+        }).required()
+    }),
+    checkUsername: Joi.object({
+        body: Joi.object({
+            username: Joi.string().min(4).max(20).required()
         }).required()
     })
 };
