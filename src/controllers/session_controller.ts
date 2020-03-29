@@ -16,6 +16,8 @@ import PunishmentRepository from '../repositories/punishment_repo';
 import RedisRepo from '../repositories/base/redis_repository';
 import SessionRepository from '../repositories/session_repo';
 
+import Worker from '../jobs';
+
 export default class SessionController extends BaseController {
     public constructor() {
         super();
@@ -28,6 +30,10 @@ export default class SessionController extends BaseController {
 
             const user = await UserService.getById(context.user_id);
             const session = await SessionService.getActiveSession(context.user_id);
+
+            if (session.status != SESSION_STATUS.ON_GOING) {
+                throw HttpError.BadRequest('SESSION_NOT_ELIGIBLE');
+            }
 
             /** check time */
             let isValid = true;
@@ -44,17 +50,11 @@ export default class SessionController extends BaseController {
             }
 
             /** dispatch handler */
-            setImmediate(
-                async (): Promise<void> => {
-                    const payload = {
-                        coordinate: body.coordinate,
-                        next_log: body.next_checkin
-                    };
-                    isValid
-                        ? await SessionService.avoided(session, payload)
-                        : await SessionService.hitted(session, payload);
-                }
-            );
+            await Worker.dispatch(Worker.Job.USER_CHECKIN, {
+                session,
+                log: { coordinate: body.coordinate, next_log: body.next_checkin },
+                lose: !isValid
+            });
 
             return {
                 message: 'checkin success',

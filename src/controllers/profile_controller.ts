@@ -15,6 +15,8 @@ import { profileOutput, relationsOutput } from '../utils/transformer';
 import { GetProfilePayload } from 'src/typings/method';
 import RedisRepo from '../repositories/base/redis_repository';
 
+import Worker from '../jobs';
+
 export default class ProfileController extends BaseController {
     public constructor() {
         super();

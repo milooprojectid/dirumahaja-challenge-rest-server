@@ -16,6 +16,8 @@ import ApiGuard from './middlewares/guard';
 import RateLimiter from './middlewares/ratelimiter';
 import EmblemContoller from './controllers/emblem_controller';
 
+import Worker from './jobs';
+
 class App {
     private app: Application;
     private port: number = 3000;
@@ -48,6 +50,9 @@ class App {
         });
         FirebaseContext.initialize({
             service_account_path: String(process.env.FIREBASE_SERVICE_ACCOUNT_PATH)
+        });
+        Worker.initialize({
+            connection_string: String(process.env.REDIS_CONNECTION_STRING)
         });
     }
 
