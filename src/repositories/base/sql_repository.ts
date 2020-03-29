@@ -27,7 +27,7 @@ export default class SQLRepo<Model> extends BaseRepository {
 
     public async count(conditions: Partial<Model>): Promise<number> {
         const db = await this.getDbInstance();
-        return db[this.model].cound({ where: conditions });
+        return db[this.model].count({ where: conditions });
     }
 
     public async increment(conditions: Partial<Model>, field: string, n: number = 1): Promise<Model | undefined> {

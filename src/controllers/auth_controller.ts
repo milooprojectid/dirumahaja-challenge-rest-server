@@ -4,13 +4,12 @@ import Validator from '../middlewares/request_validator';
 import BaseController from './base/base_controller';
 import { IContext, IData, IHandlerOutput } from '../typings/common';
 import { RegisterPayload } from 'src/typings/method';
-import { userCreatePayload, userEmblemCreatePayload, relationCreatepayload } from '../utils/transformer';
+import { userCreatePayload } from '../utils/transformer';
 import SessionService from '../services/session_service';
 import UserRepository from '../repositories/user_repo';
-import RelationRepository from '../repositories/relation_repo';
-import EmblemRepository from '../repositories/user_emblem_repo';
 import EmblemService from '../services/emblem_service';
 import { EMBLEM_CODE } from '../utils/constant';
+import UserService from '../services/user_service';
 
 export default class AuthController extends BaseController {
     public async register(data: IData, context: IContext): Promise<IHandlerOutput> {
@@ -18,10 +17,7 @@ export default class AuthController extends BaseController {
             await DBContext.startTransaction();
 
             const { body }: RegisterPayload = data;
-
             const userRepo = new UserRepository();
-            const userEmblemRepo = new EmblemRepository();
-            const relationRepo = new RelationRepository();
 
             /** check id uid or username already exist */
             const [userExsist, usernameExsist] = await Promise.all([
@@ -43,18 +39,14 @@ export default class AuthController extends BaseController {
                 if (!challenger) {
                     throw HttpError.NotFound(null, 'CHALLENGER_NOT_FOUND');
                 }
-                await Promise.all([
-                    relationRepo.create(relationCreatepayload(body.uid, body.challenger)),
-                    relationRepo.create(relationCreatepayload(body.challenger, body.uid))
-                ]);
+                await UserService.pair(user.id, body.challenger);
             }
 
-            /** initialize session */
-            await SessionService.initializeNewSession(body.uid);
-
-            /** generate user emblem */
-            await userEmblemRepo.create(userEmblemCreatePayload(body.uid));
-            EmblemService.attach(user.id, EMBLEM_CODE.HERO_ONE, true);
+            /** initialize session and generate user emblem */
+            await Promise.all([
+                SessionService.initializeNewSession(body.uid),
+                EmblemService.attach(user.id, EMBLEM_CODE.HERO_ONE, true)
+            ]);
 
             await DBContext.commit();
 
