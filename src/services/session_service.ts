@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import * as bluebird from 'bluebird';
 
 import SessionRepository from '../repositories/session_repo';
-import { SESSION_STATUS, LOG_STATUS, NOTIFICATION } from '../utils/constant';
+import { SESSION_STATUS, LOG_STATUS, NOTIFICATION, EMBLEM_CODE } from '../utils/constant';
 import { initSessionPayload } from '../utils/transformer';
 import { Session } from 'src/typings/models';
 import UserService from './user_service';
@@ -13,6 +13,7 @@ import { parseCoordinate, timestamp } from '../utils/helpers';
 import LogRepository from '../repositories/log_repo';
 import RelationRepository from '../repositories/relation_repo';
 import NotificationRepository from '../repositories/notification_repo';
+import EmblemService from './emblem_service';
 
 export default class SessionService {
     public static async initializeNewSession(userId: string): Promise<void> {
@@ -82,30 +83,9 @@ export default class SessionService {
 
             /** notification */
             const relations = await relationRepo.findAll({ challenger_id: session.user_id });
-            await bluebird.map(
-                relations,
-                (relation): any =>
-                    notifRepo
-                        .create({
-                            user_id: relation.user_id,
-                            text: NOTIFICATION.WIN.text,
-                            img_url: NOTIFICATION.WIN.icon
-                        })
-                        .then((): any =>
-                            sessionRepo.increment(
-                                { user_id: relation.user_id, status: SESSION_STATUS.ON_GOING },
-                                'health'
-                            )
-                        )
-                        .then((): any =>
-                            sendToTopic({
-                                topic: relation.user_id,
-                                data: NOTIFICATION.WIN,
-                                notification: { title: 'Yuhuu, kamu mendapatkan nyawa' }
-                            })
-                        ),
-                { concurrency: 5 }
-            );
+            await bluebird.map(relations, (relation): any => UserService.addHealth(relation.user_id), {
+                concurrency: 5
+            });
         } catch (err) {
             console.error(err.message);
         }
@@ -127,6 +107,19 @@ export default class SessionService {
                     status: LOG_STATUS.VALID
                 })
             ]);
+
+            switch (days) {
+                case 1: {
+                    await EmblemService.attach(session.user_id, EMBLEM_CODE.HERO_TWO);
+                    break;
+                }
+                case 7: {
+                    await EmblemService.attach(session.user_id, EMBLEM_CODE.WARRIOR_PANDEMI);
+                    break;
+                }
+                default:
+                    break;
+            }
 
             await UserService.bustProfileCache(session.user_id);
         } catch (err) {

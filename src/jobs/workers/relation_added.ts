@@ -16,19 +16,11 @@ export default async ({ data }: { data: Data }): Promise<void> => {
         switch (newTotalRelation) {
             case 5: {
                 await EmblemService.attach(data.user_id, EMBLEM_CODE.AQUA_VIRUS);
-                await Worker.dispatch(Worker.Job.EMBLEM_ATTACHED, {
-                    user_id: data.user_id,
-                    emblem_code: EMBLEM_CODE.AQUA_VIRUS
-                });
                 break;
             }
 
             case 10: {
                 await EmblemService.attach(data.user_id, EMBLEM_CODE.INFLUENCER);
-                await Worker.dispatch(Worker.Job.EMBLEM_ATTACHED, {
-                    user_id: data.user_id,
-                    emblem_code: EMBLEM_CODE.INFLUENCER
-                });
                 break;
             }
 
