@@ -21,8 +21,6 @@ export default async ({ data }: { data: Data }): Promise<void> => {
             await SessionService.avoided(data.session, data.log);
         }
 
-        console.info(`${data.session.user_id} is ${data.lose}`);
-
         await DBContext.commit();
     } catch (err) {
         await DBContext.rollback();

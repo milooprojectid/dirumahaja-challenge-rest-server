@@ -9,6 +9,8 @@ import SessionService from '../services/session_service';
 import UserRepository from '../repositories/user_repo';
 import RelationRepository from '../repositories/relation_repo';
 import EmblemRepository from '../repositories/user_emblem_repo';
+import EmblemService from '../services/emblem_service';
+import { EMBLEM_CODE } from '../utils/constant';
 
 export default class AuthController extends BaseController {
     public async register(data: IData, context: IContext): Promise<IHandlerOutput> {
@@ -22,18 +24,18 @@ export default class AuthController extends BaseController {
             const relationRepo = new RelationRepository();
 
             /** check id uid or username already exist */
-            const [user, username] = await Promise.all([
+            const [userExsist, usernameExsist] = await Promise.all([
                 userRepo.findOne({ id: body.uid }),
                 userRepo.findOne({ username: body.username })
             ]);
 
-            if (user || username) {
+            if (userExsist || usernameExsist) {
                 throw HttpError.BadRequest(null, 'USER_ALREADY_EXIST');
             }
 
             /** generate new user */
             const payload = userCreatePayload(data);
-            await userRepo.create(payload);
+            const user = await userRepo.create(payload);
 
             /** generate relation */
             if (body.challenger && body.challenger != body.username) {
@@ -52,6 +54,7 @@ export default class AuthController extends BaseController {
 
             /** generate user emblem */
             await userEmblemRepo.create(userEmblemCreatePayload(body.uid));
+            EmblemService.attach(user.id, EMBLEM_CODE.HERO_ONE, true);
 
             await DBContext.commit();
 
