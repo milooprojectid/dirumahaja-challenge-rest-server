@@ -15,7 +15,7 @@ import { profileOutput, relationsOutput } from '../utils/transformer';
 import { GetProfilePayload } from 'src/typings/method';
 import RedisRepo from '../repositories/base/redis_repository';
 import { Notification } from '../typings/models';
-import { CACHE_TTL } from 'src/utils/constant';
+import { CACHE_TTL } from '../utils/constant';
 
 export default class ProfileController extends BaseController {
     public constructor() {
