@@ -1,5 +1,6 @@
 import UserEmblemRepository from '../../repositories/user_emblem_repo';
 import { EMBLEM_CODE } from '../../utils/constant';
+// import NotificationService from 'src/services/notification_service';
 
 interface Data {
     user_id: string;
@@ -13,7 +14,10 @@ export default async ({ data }: { data: Data }): Promise<void> => {
             const totalEmblem = await userEmblemRepo.count({ user_id: data.user_id });
             if (totalEmblem >= 7) {
                 const payload = { user_id: data.user_id, code: EMBLEM_CODE.CORONA_HERO };
-                await userEmblemRepo.upsert(payload, payload);
+                await Promise.all([
+                    userEmblemRepo.upsert(payload, payload)
+                    // NotificationService
+                ]);
             }
         }
     } catch (err) {

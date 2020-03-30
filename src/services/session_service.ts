@@ -3,17 +3,16 @@ import * as moment from 'moment';
 import * as bluebird from 'bluebird';
 
 import SessionRepository from '../repositories/session_repo';
-import { SESSION_STATUS, LOG_STATUS, NOTIFICATION, EMBLEM_CODE } from '../utils/constant';
+import { SESSION_STATUS, LOG_STATUS, EMBLEM_CODE } from '../utils/constant';
 import { initSessionPayload } from '../utils/transformer';
 import { Session } from 'src/typings/models';
 import UserService from './user_service';
-import { sendToTopic } from '../utils/notification';
 import { parseCoordinate, timestamp } from '../utils/helpers';
 
 import LogRepository from '../repositories/log_repo';
 import RelationRepository from '../repositories/relation_repo';
-import NotificationRepository from '../repositories/notification_repo';
 import EmblemService from './emblem_service';
+import NotificationService from './notification_service';
 
 export default class SessionService {
     public static async initializeNewSession(userId: string): Promise<void> {
@@ -47,7 +46,6 @@ export default class SessionService {
         try {
             const sessionRepo = new SessionRepository();
             const relationRepo = new RelationRepository();
-            const notifRepo = new NotificationRepository();
             const logRepo = new LogRepository();
 
             const newHealth = session.health - 1;
@@ -57,34 +55,28 @@ export default class SessionService {
             if (newHealth <= 0) {
                 payload.status = SESSION_STATUS.CLOSED;
                 payload.end_time = timestamp();
+
+                /** give health to every friends */
+                await bluebird.all([
+                    sessionRepo.update({ id: session.id }, payload),
+                    UserService.bustProfileCache(session.user_id),
+                    NotificationService.sendLoseNotification(session.user_id)
+                ]);
+
+                /** notification */
+                const relations = await relationRepo.findAll({ challenger_id: session.user_id });
+                await bluebird.map(
+                    relations,
+                    (relation): any => UserService.addHealth(relation.user_id, session.user_id),
+                    { concurrency: 5 }
+                );
             }
 
-            /** give health to every friends */
             const coordinate = parseCoordinate(log.coordinate);
-            await bluebird.all([
-                sessionRepo.update({ id: session.id }, payload),
-                logRepo.create({
-                    session_id: session.id,
-                    coordinate: { type: 'Point', coordinates: coordinate },
-                    status: LOG_STATUS.VALID
-                }),
-                UserService.bustProfileCache(session.user_id),
-                notifRepo.create({
-                    user_id: session.user_id,
-                    text: NOTIFICATION.LOSE.text,
-                    img_url: NOTIFICATION.LOSE.icon
-                }),
-                sendToTopic({
-                    topic: session.user_id,
-                    data: NOTIFICATION.LOSE,
-                    notification: { title: 'Oh tidaak, kamu kalah' }
-                })
-            ]);
-
-            /** notification */
-            const relations = await relationRepo.findAll({ challenger_id: session.user_id });
-            await bluebird.map(relations, (relation): any => UserService.addHealth(relation.user_id), {
-                concurrency: 5
+            await logRepo.create({
+                session_id: session.id,
+                coordinate: { type: 'Point', coordinates: coordinate },
+                status: LOG_STATUS.INVALID
             });
         } catch (err) {
             console.error(err.message);

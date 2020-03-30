@@ -14,13 +14,9 @@ module.exports = {
             type: dataTypes.STRING(255),
             allowNull: false
         },
-        text: {
+        body: {
             type: dataTypes.TEXT,
             allowNull: false
-        },
-        img_url: {
-            type: dataTypes.STRING(255),
-            defaultValue: false
         },
         created_at: {
             type: dataTypes.DATE,

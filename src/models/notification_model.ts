@@ -1,4 +1,4 @@
-export default function(sequelize: any, dataTypes: any): any {
+export default function (sequelize: any, dataTypes: any): any {
     const notification = sequelize.define(
         'Notification',
         {
@@ -12,13 +12,9 @@ export default function(sequelize: any, dataTypes: any): any {
                 type: dataTypes.STRING(255),
                 allowNull: false
             },
-            text: {
+            body: {
                 type: dataTypes.TEXT,
                 allowNull: false
-            },
-            img_url: {
-                type: dataTypes.STRING(255),
-                defaultValue: false
             },
             created_at: {
                 type: dataTypes.DATE,

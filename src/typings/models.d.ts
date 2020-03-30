@@ -62,8 +62,7 @@ export interface Emblem extends Model {
 
 export interface Notification extends Model {
     user_id: string;
-    text: string;
-    img_url: string;
+    body: string;
 }
 
 export interface Punishment extends Model {

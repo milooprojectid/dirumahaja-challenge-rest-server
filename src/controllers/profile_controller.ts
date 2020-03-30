@@ -14,8 +14,7 @@ import SessionService from '../services/session_service';
 import { profileOutput, relationsOutput } from '../utils/transformer';
 import { GetProfilePayload } from 'src/typings/method';
 import RedisRepo from '../repositories/base/redis_repository';
-
-import Worker from '../jobs';
+import { Notification } from '../typings/models';
 
 export default class ProfileController extends BaseController {
     public constructor() {
@@ -96,7 +95,7 @@ export default class ProfileController extends BaseController {
             const notificationRepo = new NotificationRepository();
             const redisRepo = new RedisRepo('notification');
 
-            let notifications: any[] = await redisRepo.findOne(context.user_id);
+            let notifications: Notification[] = await redisRepo.findOne(context.user_id);
             if (!notifications) {
                 notifications = await notificationRepo.findAll({ user_id: context.user_id });
                 await redisRepo.create(context.user_id, notifications, 600);
@@ -104,10 +103,7 @@ export default class ProfileController extends BaseController {
 
             return {
                 message: 'notification data retrieved',
-                data: notifications.map((item): any => ({
-                    text: item.text,
-                    img_url: item.img_url
-                }))
+                data: notifications.map((item): any => JSON.parse(item.body))
             };
         } catch (err) {
             if (err.status) throw err;
