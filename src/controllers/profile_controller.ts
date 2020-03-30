@@ -15,6 +15,7 @@ import { profileOutput, relationsOutput } from '../utils/transformer';
 import { GetProfilePayload } from 'src/typings/method';
 import RedisRepo from '../repositories/base/redis_repository';
 import { Notification } from '../typings/models';
+import { CACHE_TTL } from 'src/utils/constant';
 
 export default class ProfileController extends BaseController {
     public constructor() {
@@ -49,7 +50,7 @@ export default class ProfileController extends BaseController {
                 const session = await SessionService.getActiveSession(context.user_id);
                 returnPayload = profileOutput(user, emblem, session);
 
-                await redisRepo.create(context.user_id, returnPayload, 600);
+                await redisRepo.create(context.user_id, returnPayload, CACHE_TTL);
             }
 
             return {
@@ -77,7 +78,7 @@ export default class ProfileController extends BaseController {
             if (!returnPayload) {
                 const relations = await relationRepo.getDetailedRelations(context.user_id);
                 returnPayload = relationsOutput(relations);
-                await redisRepo.create(context.user_id, returnPayload, 600);
+                await redisRepo.create(context.user_id, returnPayload, CACHE_TTL);
             }
 
             return {
@@ -98,7 +99,7 @@ export default class ProfileController extends BaseController {
             let notifications: Notification[] = await redisRepo.findOne(context.user_id);
             if (!notifications) {
                 notifications = await notificationRepo.findAll({ user_id: context.user_id });
-                await redisRepo.create(context.user_id, notifications, 600);
+                await redisRepo.create(context.user_id, notifications, CACHE_TTL);
             }
 
             return {

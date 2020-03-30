@@ -28,3 +28,5 @@ export enum EMBLEM_CODE {
 }
 
 export const MAX_HOME_RADIUS = 500;
+
+export const CACHE_TTL = 300; // seconds

@@ -9,7 +9,7 @@ import { relationCreatepayload } from '../utils/transformer';
 import Worker from '../jobs';
 import SessionRepository from '../repositories/session_repo';
 import SessionService from './session_service';
-import { EMBLEM_CODE } from '../utils/constant';
+import { EMBLEM_CODE, CACHE_TTL } from '../utils/constant';
 import EmblemService from './emblem_service';
 import NotificationService from './notification_service';
 
@@ -26,7 +26,7 @@ export default class UserService {
                 if (!user) {
                     throw HttpError.NotFound(null, 'USER_NOT_FOUND');
                 }
-                await redisRepo.create(userId, user, 600);
+                await redisRepo.create(userId, user, CACHE_TTL);
                 returnPayload = user;
             }
 

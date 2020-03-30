@@ -64,10 +64,13 @@ export default class SessionService {
                 ]);
 
                 /** notification */
-                const relations = await relationRepo.findAll({ challenger_id: session.user_id });
+                const [user, relations] = await Promise.all([
+                    UserService.getById(session.user_id),
+                    relationRepo.findAll({ challenger_id: session.user_id })
+                ]);
                 await bluebird.map(
                     relations,
-                    (relation): any => UserService.addHealth(relation.user_id, session.user_id),
+                    (relation): any => UserService.addHealth(relation.user_id, user.username),
                     { concurrency: 5 }
                 );
             }
