@@ -24,7 +24,7 @@ export default class RelationRepository extends SQLRepo<Relation> {
                         model: db.Session,
                         required: true,
                         as: 'active_session',
-                        where: { status: SESSION_STATUS.ON_GOING }
+                        where: { is_active: true }
                     },
                     {
                         model: db.UserEmblem,
