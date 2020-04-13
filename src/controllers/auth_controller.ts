@@ -52,7 +52,7 @@ export default class AuthController extends BaseController {
 
             return {
                 message: 'registration success',
-                data: {}
+                data: data
             };
         } catch (err) {
             await DBContext.rollback();

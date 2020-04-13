@@ -12,7 +12,7 @@ export const userCreatePayload = ({ body: data }: RegisterPayload): Partial<User
         age: data.age,
         gender: data.gender,
         coordinate: { type: 'Point', coordinates: [lat, lng] },
-        location_name: null
+        location_name: data.location_name || null
     };
 };
 

@@ -6,6 +6,7 @@ export interface RegisterPayload {
         gender: string;
         coordinate: string;
         challenger: string;
+        location_name: string;
     };
 }
 

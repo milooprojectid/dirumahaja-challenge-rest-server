@@ -12,7 +12,8 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
             age: Joi.number().integer().positive().optional(),
             gender: Joi.string().valid('m', 'f').optional(),
             coordinate: Joi.string().regex(COOR_REGEX).required(),
-            challenger: Joi.string().max(255).optional().allow('', null)
+            challenger: Joi.string().max(255).optional().allow('', null),
+            location_name: Joi.string().max(50).optional().allow('', null)
         }).required()
     }),
     checkUsername: Joi.object({
