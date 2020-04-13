@@ -49,8 +49,8 @@ export default class UserService {
 
         await Promise.all([
             relationRepo.upsert(payloadA, payloadA),
-            relationRepo.upsert(payloadB, payloadB),
-            this.addHealth(userIdB)
+            relationRepo.upsert(payloadB, payloadB)
+            // this.addHealth(userIdB)
         ]);
 
         await Worker.dispatch(Worker.Job.RELATION_ADDED, { user_id: userIdB });
