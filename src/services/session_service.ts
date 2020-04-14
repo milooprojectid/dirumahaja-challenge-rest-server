@@ -43,82 +43,73 @@ export default class SessionService {
     }
 
     public static async hitted(session: Session, log: { coordinate: string; next_log: string }): Promise<void> {
-        try {
-            const sessionRepo = new SessionRepository();
-            const relationRepo = new RelationRepository();
-            const logRepo = new LogRepository();
+        const sessionRepo = new SessionRepository();
+        const relationRepo = new RelationRepository();
+        const logRepo = new LogRepository();
 
-            const newHealth = session.health - 1;
-            const days = Math.abs(moment(session.start_time).diff(moment(), 'days'));
+        const newHealth = session.health - 1;
+        const days = Math.abs(moment(session.start_time).diff(moment(), 'days'));
 
-            const payload: { [s: string]: any } = { health: newHealth, next_log: log.next_log || null, days };
-            if (newHealth <= 0) {
-                payload.status = SESSION_STATUS.CLOSED;
-                payload.end_time = timestamp();
+        const payload: { [s: string]: any } = { health: newHealth, next_log: log.next_log || null, days };
+        if (newHealth <= 0) {
+            payload.status = SESSION_STATUS.CLOSED;
+            payload.end_time = timestamp();
 
-                /** give health to every friends */
-                await bluebird.all([
-                    sessionRepo.update({ id: session.id }, payload),
-                    UserService.bustProfileCache(session.user_id),
-                    NotificationService.sendLoseNotification(session.user_id)
-                ]);
+            /** give health to every friends */
+            await bluebird.all([
+                sessionRepo.update({ id: session.id }, payload),
+                UserService.bustProfileCache(session.user_id),
+                NotificationService.sendLoseNotification(session.user_id)
+            ]);
 
-                /** notification */
-                const [user, relations] = await Promise.all([
-                    UserService.getById(session.user_id),
-                    relationRepo.findAll({ challenger_id: session.user_id })
-                ]);
-                await bluebird.map(
-                    relations,
-                    (relation): any => UserService.addHealth(relation.user_id, user.username),
-                    { concurrency: 5 }
-                );
-            }
+            /** notification */
+            const [user, relations] = await Promise.all([
+                UserService.getById(session.user_id),
+                relationRepo.findAll({ challenger_id: session.user_id })
+            ]);
 
-            const coordinate = parseCoordinate(log.coordinate);
-            await logRepo.create({
-                session_id: session.id,
-                coordinate: { type: 'Point', coordinates: coordinate },
-                status: LOG_STATUS.INVALID
+            await bluebird.map(relations, (relation): any => UserService.addHealth(relation.user_id, user.username), {
+                concurrency: 5
             });
-        } catch (err) {
-            console.error(err.message);
         }
+
+        const coordinate = parseCoordinate(log.coordinate);
+        await logRepo.create({
+            session_id: session.id,
+            coordinate: { type: 'Point', coordinates: coordinate },
+            status: LOG_STATUS.INVALID
+        });
     }
 
     public static async avoided(session: Session, log: { coordinate: string; next_log: string }): Promise<void> {
-        try {
-            const sessionRepo = new SessionRepository();
-            const logRepo = new LogRepository();
+        const sessionRepo = new SessionRepository();
+        const logRepo = new LogRepository();
 
-            const coordinate = parseCoordinate(log.coordinate);
-            const days = Math.abs(moment(session.start_time).diff(moment(), 'days'));
+        const coordinate = parseCoordinate(log.coordinate);
+        const days = Math.abs(moment(session.start_time).diff(moment(), 'days'));
 
-            await Promise.all([
-                sessionRepo.update({ id: session.id }, { days: days, next_log: log.next_log || null }),
-                logRepo.create({
-                    session_id: session.id,
-                    coordinate: { type: 'Point', coordinates: coordinate },
-                    status: LOG_STATUS.VALID
-                })
-            ]);
+        await Promise.all([
+            sessionRepo.update({ id: session.id }, { days: days, next_log: log.next_log || null }),
+            logRepo.create({
+                session_id: session.id,
+                coordinate: { type: 'Point', coordinates: coordinate },
+                status: LOG_STATUS.VALID
+            })
+        ]);
 
-            switch (days) {
-                case 1: {
-                    await EmblemService.attach(session.user_id, EMBLEM_CODE.HERO_TWO);
-                    break;
-                }
-                case 7: {
-                    await EmblemService.attach(session.user_id, EMBLEM_CODE.WARRIOR_PANDEMI);
-                    break;
-                }
-                default:
-                    break;
+        switch (days) {
+            case 1: {
+                await EmblemService.attach(session.user_id, EMBLEM_CODE.HERO_TWO);
+                break;
             }
-
-            await UserService.bustProfileCache(session.user_id);
-        } catch (err) {
-            console.error(err.message);
+            case 7: {
+                await EmblemService.attach(session.user_id, EMBLEM_CODE.WARRIOR_PANDEMI);
+                break;
+            }
+            default:
+                break;
         }
+
+        await UserService.bustProfileCache(session.user_id);
     }
 }
