@@ -15,8 +15,6 @@ export default async ({ data }: { data: Data }): Promise<void> => {
     try {
         await DBContext.startTransaction();
 
-        console.info(`checkin-data: ${JSON.stringify(data)}`);
-
         if (data.lose) {
             await SessionService.hitted(data.session, data.log);
         } else {

@@ -57,7 +57,6 @@ export default class SessionService {
 
             /** give health to every friends */
             await bluebird.all([
-                sessionRepo.update({ id: session.id }, payload),
                 UserService.bustProfileCache(session.user_id),
                 NotificationService.sendLoseNotification(session.user_id)
             ]);
@@ -74,11 +73,14 @@ export default class SessionService {
         }
 
         const coordinate = parseCoordinate(log.coordinate);
-        await logRepo.create({
-            session_id: session.id,
-            coordinate: { type: 'Point', coordinates: coordinate },
-            status: LOG_STATUS.INVALID
-        });
+        await Promise.all([
+            logRepo.create({
+                session_id: session.id,
+                coordinate: { type: 'Point', coordinates: coordinate },
+                status: LOG_STATUS.INVALID
+            }),
+            sessionRepo.update({ id: session.id }, payload)
+        ]);
     }
 
     public static async avoided(session: Session, log: { coordinate: string; next_log: string }): Promise<void> {
