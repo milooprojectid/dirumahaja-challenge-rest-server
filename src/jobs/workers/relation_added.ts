@@ -1,5 +1,4 @@
 import RelationRepository from '../../repositories/relation_repo';
-import Worker from '../';
 import EmblemService from '../../services/emblem_service';
 import { EMBLEM_CODE } from '../../utils/constant';
 
