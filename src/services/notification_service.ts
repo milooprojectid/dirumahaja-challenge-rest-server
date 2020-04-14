@@ -10,19 +10,19 @@ export default class NotificationService {
         const action = '/punishment';
 
         await Promise.all([
-            sendToTopic({
-                notification: {
-                    title: 'Kamu kalah :(',
-                    body: message
-                },
-                data: {
-                    screen: action,
-                    click_action: 'FLUTTER_NOTIFICATION_CLICK',
-                    icon: icon,
-                    user_id: userId
-                },
-                topic: userId
-            }),
+            // sendToTopic({
+            //     notification: {
+            //         title: 'Kamu kalah :(',
+            //         body: message
+            //     },
+            //     data: {
+            //         screen: action,
+            //         click_action: 'FLUTTER_NOTIFICATION_CLICK',
+            //         icon: icon,
+            //         user_id: userId
+            //     },
+            //     topic: userId
+            // }),
             notifRepo.create({
                 user_id: userId,
                 body: JSON.stringify({
@@ -42,19 +42,19 @@ export default class NotificationService {
         const icon = 'https://dirumahaja.miloo.id/assets/img/notification/notification_02.png';
 
         await Promise.all([
-            sendToTopic({
-                notification: {
-                    title: 'Kamu menang !',
-                    body: message
-                },
-                data: {
-                    screen: '/',
-                    click_action: 'FLUTTER_NOTIFICATION_CLICK',
-                    icon: icon,
-                    user_id: userId
-                },
-                topic: userId
-            }),
+            // sendToTopic({
+            //     notification: {
+            //         title: 'Kamu menang !',
+            //         body: message
+            //     },
+            //     data: {
+            //         screen: '/',
+            //         click_action: 'FLUTTER_NOTIFICATION_CLICK',
+            //         icon: icon,
+            //         user_id: userId
+            //     },
+            //     topic: userId
+            // }),
             notifRepo.create({
                 user_id: userId,
                 body: JSON.stringify({
