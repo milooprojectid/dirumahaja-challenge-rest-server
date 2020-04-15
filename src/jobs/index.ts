@@ -3,11 +3,13 @@ import * as Queue from 'bull';
 import UserCheckedId from './workers/user_checked_in';
 import EmblemAttached from './workers/emblem_attached';
 import RelationAdded from './workers/relation_added';
+import UserRegistered from './workers/user_registered';
 
 let instance: { [s: string]: Queue.Queue };
 
 export enum Job {
     USER_CHECKIN = 'user-checked-in',
+    USER_REGISTERED = 'user-registered',
     EMBLEM_ATTACHED = 'emblem-attached',
     RELATION_ADDED = 'relation-added'
 }
@@ -22,10 +24,14 @@ export const initialize = async ({ connection_string }: { connection_string: str
     const relationAddedQueue = new Queue(Job.RELATION_ADDED, connection_string);
     relationAddedQueue.process(RelationAdded);
 
+    const userRegisteredQueue = new Queue(Job.USER_REGISTERED, connection_string);
+    userRegisteredQueue.process(UserRegistered);
+
     instance = {
         [Job.USER_CHECKIN]: userCheckedInQueue,
         [Job.EMBLEM_ATTACHED]: emblemAttachedQueue,
-        [Job.RELATION_ADDED]: relationAddedQueue
+        [Job.RELATION_ADDED]: relationAddedQueue,
+        [Job.USER_REGISTERED]: userRegisteredQueue
     };
 };
 
