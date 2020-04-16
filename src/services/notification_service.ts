@@ -60,8 +60,8 @@ export default class NotificationService {
                 body: JSON.stringify({
                     text: message,
                     icon: icon,
-                    button: null,
-                    action: null
+                    button: '',
+                    action: ''
                 })
             })
         ]);
