@@ -2,10 +2,13 @@ import { HttpError, DBContext } from 'tymon';
 
 import BaseController from './base/base_controller';
 import AuthMiddleware from '../middlewares/firebase';
-import EmblemRepository from '../repositories/emblem_repo';
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
+import MilooService from '../services/miloo_service';
+import * as bluebird from 'bluebird';
+import UserRepository from '../repositories/user_repo';
+import NotificationService from '../services/notification_service';
 
-export default class EmblemContoller extends BaseController {
+export default class ScheduleController extends BaseController {
     public constructor() {
         super();
         this.setMiddleware(AuthMiddleware);
@@ -13,12 +16,18 @@ export default class EmblemContoller extends BaseController {
 
     public async notifyCovid19(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
-            const emblemRepo = new EmblemRepository();
-            const emblems = await emblemRepo.findAll({}, 'id', ['code', 'name', 'img_url']);
+            const userRepo = new UserRepository();
+            const [covid19Data, users] = await Promise.all([MilooService.getCovid19Data(false), userRepo.findAll({})]);
+
+            await bluebird.map(
+                users,
+                (user): Promise<void> => NotificationService.sendCovidNotification(covid19Data, user.username),
+                { concurrency: 5 }
+            );
 
             return {
-                message: 'all emblem retrieved',
-                data: emblems
+                message: 'all user notified',
+                data: covid19Data
             };
         } catch (err) {
             if (err.status) throw err;

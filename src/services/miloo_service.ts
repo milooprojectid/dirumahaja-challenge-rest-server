@@ -1,8 +1,9 @@
 import RedisRepo from '../repositories/base/redis_repository';
 import axios from 'axios';
+import { Covid19Data } from 'src/typings/common';
 
 export default class MilooService {
-    public static async getCovid19Data(cached: boolean = true): Promise<any> {
+    public static async getCovid19Data(cached: boolean = true): Promise<Covid19Data> {
         const redisRepo = new RedisRepo('general');
 
         let covidData: any;
