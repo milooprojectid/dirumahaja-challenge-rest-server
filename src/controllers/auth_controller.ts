@@ -40,7 +40,7 @@ export default class AuthController extends BaseController {
                 if (!challenger) {
                     throw HttpError.NotFound(null, 'CHALLENGER_NOT_FOUND');
                 }
-                await UserService.pair(user.id, challenger.id);
+                await UserService.pair(user, challenger);
             }
 
             /** initialize session and generate user emblem */

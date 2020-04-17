@@ -1,6 +1,7 @@
 import { sendToTopic } from '../utils/notification';
 import NotificationRepository from '../repositories/notification_repo';
 import UserService from './user_service';
+import { User } from 'src/typings/models';
 
 export default class NotificationService {
     public static async sendLoseNotification(userId: string): Promise<void> {
@@ -71,12 +72,10 @@ export default class NotificationService {
         ]);
     }
 
-    public static async sendRelationNotification(userId: string, challengerId: string): Promise<void> {
+    public static async sendRelationNotification(challenger: User, origin: User): Promise<void> {
         const notifRepo = new NotificationRepository();
 
-        const [user, challenger] = await Promise.all([UserService.getById(userId), UserService.getById(challengerId)]);
-
-        const message = `${challenger.username} menambahkan mu sebagai challenger`;
+        const message = `${origin.username} menambahkan mu sebagai challenger`;
         const icon = 'https://dirumahaja.miloo.id/assets/img/notification/notification_02.png';
 
         await Promise.all([
@@ -89,12 +88,12 @@ export default class NotificationService {
                     screen: '/',
                     click_action: 'FLUTTER_NOTIFICATION_CLICK',
                     icon: icon,
-                    user_id: user.username
+                    user_id: challenger.username
                 },
-                topic: userId
+                topic: challenger.id
             }),
             notifRepo.create({
-                user_id: userId,
+                user_id: challenger.id,
                 body: JSON.stringify({
                     text: message,
                     icon: icon,

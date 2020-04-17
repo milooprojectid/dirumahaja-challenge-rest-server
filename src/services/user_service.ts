@@ -41,20 +41,20 @@ export default class UserService {
         await redisRepo.delete(userId);
     }
 
-    public static async pair(userIdA: string, userIdB: string): Promise<void> {
+    public static async pair(userA: User, userB: User): Promise<void> {
         const relationRepo = new RelationRepository();
 
-        const payloadA = relationCreatepayload(userIdA, userIdB);
-        const payloadB = relationCreatepayload(userIdB, userIdA);
+        const payloadA = relationCreatepayload(userA.id, userB.id);
+        const payloadB = relationCreatepayload(userB.id, userA.id);
 
         await Promise.all([
             relationRepo.upsert(payloadA, payloadA),
             relationRepo.upsert(payloadB, payloadB),
-            this.addHealth(userIdB),
-            NotificationService.sendRelationNotification(userIdB, userIdA)
+            this.addHealth(userB.id),
+            NotificationService.sendRelationNotification(userB, userA)
         ]);
 
-        await Worker.dispatch(Worker.Job.RELATION_ADDED, { user_id: userIdB });
+        await Worker.dispatch(Worker.Job.RELATION_ADDED, { user_id: userB.id });
     }
 
     public static async addHealth(userId: string): Promise<void> {
