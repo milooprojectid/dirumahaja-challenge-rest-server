@@ -1,7 +1,8 @@
-import { sendToTopic } from '../utils/notification';
+import { sendToFcm } from '../utils/notification';
 import NotificationRepository from '../repositories/notification_repo';
 import UserService from './user_service';
 import { User } from 'src/typings/models';
+import { Covid19Data } from 'src/typings/common';
 
 export default class NotificationService {
     public static async sendLoseNotification(userId: string): Promise<void> {
@@ -12,20 +13,22 @@ export default class NotificationService {
         const icon = 'https://dirumahaja.miloo.id/assets/img/notification/notification_01.png';
         const action = '/punishment';
 
+        const payload = {
+            notification: {
+                title: 'Kamu kalah :(',
+                body: message
+            },
+            data: {
+                screen: action,
+                click_action: 'FLUTTER_NOTIFICATION_CLICK',
+                icon: icon,
+                user_id: userId
+            },
+            topic: user.username
+        };
+
         await Promise.all([
-            sendToTopic({
-                notification: {
-                    title: 'Kamu kalah :(',
-                    body: message
-                },
-                data: {
-                    screen: action,
-                    click_action: 'FLUTTER_NOTIFICATION_CLICK',
-                    icon: icon,
-                    user_id: userId
-                },
-                topic: user.username
-            }),
+            sendToFcm(payload),
             notifRepo.create({
                 user_id: userId,
                 body: JSON.stringify({
@@ -46,20 +49,22 @@ export default class NotificationService {
         const message = `Yesss! Kamu menang Challenge melawan ${challenger.username}. Jangan lupa tagih hadiah mu`;
         const icon = 'https://dirumahaja.miloo.id/assets/img/notification/notification_02.png';
 
+        const payload = {
+            notification: {
+                title: 'Kamu menang !',
+                body: message
+            },
+            data: {
+                screen: '/',
+                click_action: 'FLUTTER_NOTIFICATION_CLICK',
+                icon: icon,
+                user_id: userId
+            },
+            topic: user.username
+        };
+
         await Promise.all([
-            sendToTopic({
-                notification: {
-                    title: 'Kamu menang !',
-                    body: message
-                },
-                data: {
-                    screen: '/',
-                    click_action: 'FLUTTER_NOTIFICATION_CLICK',
-                    icon: icon,
-                    user_id: userId
-                },
-                topic: user.username
-            }),
+            sendToFcm(payload),
             notifRepo.create({
                 user_id: userId,
                 body: JSON.stringify({
@@ -78,20 +83,22 @@ export default class NotificationService {
         const message = `${origin.username} menambahkan mu sebagai challenger`;
         const icon = 'https://dirumahaja.miloo.id/assets/img/notification/notification_02.png';
 
+        const payload = {
+            notification: {
+                title: 'Challenger baru !',
+                body: message
+            },
+            data: {
+                screen: '/',
+                click_action: 'FLUTTER_NOTIFICATION_CLICK',
+                icon: icon,
+                user_id: challenger.id
+            },
+            topic: challenger.username
+        };
+
         await Promise.all([
-            sendToTopic({
-                notification: {
-                    title: 'Challenger baru !',
-                    body: message
-                },
-                data: {
-                    screen: '/',
-                    click_action: 'FLUTTER_NOTIFICATION_CLICK',
-                    icon: icon,
-                    user_id: challenger.id
-                },
-                topic: challenger.username
-            }),
+            sendToFcm(payload),
             notifRepo.create({
                 user_id: challenger.id,
                 body: JSON.stringify({
@@ -102,5 +109,19 @@ export default class NotificationService {
                 })
             })
         ]);
+    }
+
+    public static async sendCovidNotification(data: Covid19Data, topic: string = 'all'): Promise<void> {
+        await sendToFcm({
+            notification: {
+                title: 'Update corona',
+                body: `Kasus positif corona di indonesia kini ${data.confirmed}`
+            },
+            data: {
+                screen: '/',
+                click_action: 'FLUTTER_NOTIFICATION_CLICK'
+            },
+            topic
+        });
     }
 }
