@@ -1,5 +1,4 @@
 import { HttpError } from 'tymon';
-import * as axios from 'axios';
 
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
 import Validator from '../middlewares/request_validator';
@@ -16,6 +15,7 @@ import { GetProfilePayload } from 'src/typings/method';
 import RedisRepo from '../repositories/base/redis_repository';
 import { Notification } from '../typings/models';
 import { CACHE_TTL } from '../utils/constant';
+import MilooService from '../services/miloo_service';
 
 export default class ProfileController extends BaseController {
     public constructor() {
@@ -114,15 +114,7 @@ export default class ProfileController extends BaseController {
 
     public async getCovidData(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
-            const redisRepo = new RedisRepo('general');
-
-            let covidData: any = await redisRepo.findOne('covid');
-            if (!covidData) {
-                const { data: payload } = await axios.default.get('https://miloo-phoenix.firebaseio.com/covid-19.json');
-                covidData = payload;
-                redisRepo.create('covid', covidData, 100);
-            }
-
+            let covidData = await MilooService.getCovid19Data();
             return {
                 message: 'covid-19 data retrieved',
                 data: covidData
