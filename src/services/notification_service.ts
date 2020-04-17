@@ -88,9 +88,9 @@ export default class NotificationService {
                     screen: '/',
                     click_action: 'FLUTTER_NOTIFICATION_CLICK',
                     icon: icon,
-                    user_id: challenger.username
+                    user_id: challenger.id
                 },
-                topic: challenger.id
+                topic: challenger.username
             }),
             notifRepo.create({
                 user_id: challenger.id,
