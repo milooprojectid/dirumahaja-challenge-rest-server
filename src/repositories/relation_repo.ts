@@ -1,7 +1,6 @@
 import SQLRepo from './base/sql_repository';
 import { IContext } from 'src/typings/common';
 import { Relation } from '../typings/models';
-import { SESSION_STATUS } from '../utils/constant';
 
 export default class RelationRepository extends SQLRepo<Relation> {
     public constructor(context?: IContext) {

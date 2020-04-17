@@ -13,6 +13,7 @@ import LogRepository from '../repositories/log_repo';
 import RelationRepository from '../repositories/relation_repo';
 import EmblemService from './emblem_service';
 import NotificationService from './notification_service';
+import UserRepository from 'src/repositories/user_repo';
 
 export default class SessionService {
     public static async initializeNewSession(userId: string): Promise<void> {
@@ -55,21 +56,28 @@ export default class SessionService {
             payload.status = SESSION_STATUS.CLOSED;
             payload.end_time = timestamp();
 
-            /** give health to every friends */
-            await bluebird.all([
-                UserService.bustProfileCache(session.user_id),
-                NotificationService.sendLoseNotification(session.user_id)
-            ]);
-
             /** notification */
             const [user, relations] = await Promise.all([
                 UserService.getById(session.user_id),
                 relationRepo.findAll({ challenger_id: session.user_id })
             ]);
 
-            await bluebird.map(relations, (relation): any => UserService.addHealth(relation.user_id, user.username), {
-                concurrency: 5
-            });
+            /** give health to every friends */
+            await bluebird.all([
+                UserService.bustProfileCache(session.user_id),
+                NotificationService.sendLoseNotification(user.id)
+            ]);
+
+            await bluebird.map(
+                relations,
+                (relation): any =>
+                    UserService.addHealth(relation.user_id).then(
+                        (): Promise<void> => NotificationService.sendWinNotification(relation.user_id, user.id)
+                    ),
+                {
+                    concurrency: 5
+                }
+            );
         }
 
         const coordinate = parseCoordinate(log.coordinate);
