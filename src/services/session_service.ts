@@ -65,7 +65,7 @@ export default class SessionService {
             /** give health to every friends */
             await bluebird.all([
                 UserService.bustProfileCache(session.user_id),
-                NotificationService.sendLoseNotification(user.username)
+                NotificationService.sendLoseNotification(user.id)
             ]);
 
             await bluebird.map(
