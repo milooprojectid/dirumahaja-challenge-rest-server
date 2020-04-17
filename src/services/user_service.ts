@@ -49,24 +49,21 @@ export default class UserService {
 
         await Promise.all([
             relationRepo.upsert(payloadA, payloadA),
-            relationRepo.upsert(payloadB, payloadB)
-            // this.addHealth(userIdB)
+            relationRepo.upsert(payloadB, payloadB),
+            this.addHealth(userIdB),
+            NotificationService.sendRelationNotification(userIdB, userIdA)
         ]);
 
         await Worker.dispatch(Worker.Job.RELATION_ADDED, { user_id: userIdB });
     }
 
-    public static async addHealth(userId: string, from: string | null = null): Promise<void> {
+    public static async addHealth(userId: string): Promise<void> {
         const sessionRepo = new SessionRepository();
+
         const session = await SessionService.getActiveSession(userId);
         const newHealth = session.health + 1;
 
-        let sendNotification;
-        if (from) {
-            sendNotification = NotificationService.sendHealthNotification(session.user_id, from);
-        }
-
-        await Promise.all([sessionRepo.update({ id: session.id }, { health: newHealth }), sendNotification]);
+        await Promise.all([sessionRepo.update({ id: session.id }, { health: newHealth })]);
 
         switch (newHealth) {
             case 3: {
