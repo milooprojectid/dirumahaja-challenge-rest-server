@@ -15,8 +15,10 @@ import { MAX_HOME_RADIUS, SESSION_STATUS } from '../utils/constant';
 import PunishmentRepository from '../repositories/punishment_repo';
 import RedisRepo from '../repositories/base/redis_repository';
 import SessionRepository from '../repositories/session_repo';
+import LogRepository from '../repositories/log_repo';
 
 import Worker from '../jobs';
+import { logListOutput } from '../utils/transformer';
 
 export default class SessionController extends BaseController {
     public constructor() {
@@ -145,10 +147,32 @@ export default class SessionController extends BaseController {
         }
     }
 
+    public async getCurrentSessionLogs(data: IData, context: IContext): Promise<IHandlerOutput> {
+        try {
+            const { query } = data;
+            const logRepo = new LogRepository();
+
+            const session = await SessionService.getActiveSession(context.user_id);
+            const { data: logs, meta } = await logRepo.paginate({ session_id: session.id }, query);
+
+            return {
+                message: 'Logs retrieved',
+                data: {
+                    data: logListOutput(logs),
+                    meta
+                }
+            };
+        } catch (err) {
+            if (err.status) throw err;
+            throw HttpError.InternalServerError(err.message);
+        }
+    }
+
     public setRoutes(): void {
         this.addRoute('post', '/checkin', this.checkin, Validator('checkin'));
         this.addRoute('get', '/punishments', this.getPunishments);
         this.addRoute('post', '/punishments', this.setSessionPunishment, Validator('setPunishment'));
         this.addRoute('post', '/restart', this.reInitiateSession);
+        this.addRoute('get', '/logs', this.getCurrentSessionLogs, Validator('logs'));
     }
 }

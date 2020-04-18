@@ -1,4 +1,4 @@
-export default function(sequelize: any, dataTypes: any): any {
+export default function (sequelize: any, dataTypes: any): any {
     const log = sequelize.define(
         'Log',
         {

@@ -1,5 +1,5 @@
 import { RegisterPayload } from 'src/typings/method';
-import { Session, UserEmblem, Relation, User } from 'src/typings/models';
+import { Session, UserEmblem, Relation, User, Log } from 'src/typings/models';
 import { timestamp, parseCoordinate } from './helpers';
 import { SESSION_STATUS, EMBLEM_CODE } from './constant';
 
@@ -74,5 +74,15 @@ export const relationsOutput = (relations: Relation[]): any[] => {
         session_status: item.challenger?.active_session?.status,
         emblem_img_url: item.challenger?.active_emblem?.emblem?.img_url,
         emblem_name: item.challenger?.active_emblem?.emblem?.name
+    }));
+};
+
+export const logListOutput = (logs: Log[]): Partial<Log>[] => {
+    return logs.map((log): any => ({
+        id: log.id,
+        session_id: log.session_id,
+        coordinate: log.coordinate,
+        status: log.status,
+        created_at: log.created_at
     }));
 };
