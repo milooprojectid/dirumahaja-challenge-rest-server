@@ -34,22 +34,13 @@ export default class AuthController extends BaseController {
             const payload = userCreatePayload(data);
             const user = await userRepo.create(payload);
 
-            /** generate relation */
-            if (body.challenger && body.challenger != body.username) {
-                const challenger = await userRepo.findOne({ username: body.challenger });
-                if (!challenger) {
-                    throw HttpError.NotFound(null, 'CHALLENGER_NOT_FOUND');
-                }
-                await UserService.pair(user, challenger);
-            }
-
             /** initialize session and generate user emblem */
             await Promise.all([
                 SessionService.initializeNewSession(body.uid),
                 EmblemService.attach(user.id, EMBLEM_CODE.HERO_ONE, true)
             ]);
 
-            await Worker.dispatch(Worker.Job.USER_REGISTERED, { user });
+            await Worker.dispatch(Worker.Job.USER_REGISTERED, { user, challenger_id: body.challenger });
             await DBContext.commit();
 
             return {

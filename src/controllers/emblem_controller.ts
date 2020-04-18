@@ -8,7 +8,7 @@ import EmblemRepository from '../repositories/emblem_repo';
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
 import UserService from '../services/user_service';
 
-export default class EmblemContoller extends BaseController {
+export default class EmblemController extends BaseController {
     public constructor() {
         super();
         this.setMiddleware(AuthMiddleware);

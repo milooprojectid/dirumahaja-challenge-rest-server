@@ -41,6 +41,13 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
         body: Joi.object({
             punishment: Joi.string().min(5).max(100).required()
         }).required()
+    }),
+    logs: Joi.object({
+        query: Joi.object({
+            page: Joi.number().positive().default(1),
+            per_page: Joi.number().positive().default(10),
+            sort: Joi.string().default('-created_at')
+        }).required()
     })
 };
 
