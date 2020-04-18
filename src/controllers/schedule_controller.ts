@@ -16,14 +16,8 @@ export default class ScheduleController extends BaseController {
 
     public async notifyCovid19(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
-            const userRepo = new UserRepository();
-            const [covid19Data, users] = await Promise.all([MilooService.getCovid19Data(false), userRepo.findAll({})]);
-
-            await bluebird.map(
-                users,
-                (user): Promise<void> => NotificationService.sendCovidNotification(covid19Data, user.username),
-                { concurrency: 5 }
-            );
+            const covid19Data = await MilooService.getCovid19Data(false);
+            await NotificationService.sendCovidNotification(covid19Data);
 
             return {
                 message: 'all user notified',
