@@ -11,6 +11,7 @@ import EmblemService from '../services/emblem_service';
 import { EMBLEM_CODE } from '../utils/constant';
 import UserService from '../services/user_service';
 import Worker from '../jobs';
+import { UserRegisteredData } from 'src/typings/worker';
 
 export default class AuthController extends BaseController {
     public async register(data: IData, context: IContext): Promise<IHandlerOutput> {
@@ -40,7 +41,12 @@ export default class AuthController extends BaseController {
                 EmblemService.attach(user.id, EMBLEM_CODE.HERO_ONE, true)
             ]);
 
-            await Worker.dispatch(Worker.Job.USER_REGISTERED, { user, challenger_id: body.challenger });
+            /** dispatch async job */
+            await Worker.dispatch<UserRegisteredData>(Worker.Job.USER_REGISTERED, {
+                user,
+                challenger_id: body.challenger
+            });
+
             await DBContext.commit();
 
             return {

@@ -24,7 +24,7 @@ export default class NotificationService {
                 icon: icon,
                 user_id: userId
             },
-            topic: user.username
+            topic: user.id
         };
 
         await Promise.all([
@@ -60,7 +60,7 @@ export default class NotificationService {
                 icon: icon,
                 user_id: userId
             },
-            topic: user.username
+            topic: user.id
         };
 
         await Promise.all([
@@ -94,7 +94,7 @@ export default class NotificationService {
                 icon: icon,
                 user_id: challenger.id
             },
-            topic: challenger.username
+            topic: challenger.id
         };
 
         await Promise.all([
