@@ -1,12 +1,9 @@
 import RelationRepository from '../../repositories/relation_repo';
 import EmblemService from '../../services/emblem_service';
 import { EMBLEM_CODE } from '../../utils/constant';
+import { RelationAddedData } from 'src/typings/worker';
 
-interface Data {
-    user_id: string;
-}
-
-export default async ({ data }: { data: Data }): Promise<void> => {
+export default async ({ data }: { data: RelationAddedData }): Promise<void> => {
     try {
         const relationRepo = new RelationRepository();
         const totalRelation = await relationRepo.count({ user_id: data.user_id });

@@ -12,6 +12,7 @@ import SessionService from './session_service';
 import { EMBLEM_CODE, CACHE_TTL } from '../utils/constant';
 import EmblemService from './emblem_service';
 import NotificationService from './notification_service';
+import { RelationAddedData } from 'src/typings/worker';
 
 export default class UserService {
     public static async getById(userId: string): Promise<Complete<User>> {
@@ -54,7 +55,7 @@ export default class UserService {
             NotificationService.sendRelationNotification(userB, userA)
         ]);
 
-        await Worker.dispatch(Worker.Job.RELATION_ADDED, { user_id: userB.id });
+        await Worker.dispatch<RelationAddedData>(Worker.Job.RELATION_ADDED, { user_id: userB.id });
     }
 
     public static async addHealth(userId: string): Promise<void> {

@@ -1,13 +1,8 @@
 import UserEmblemRepository from '../../repositories/user_emblem_repo';
 import { EMBLEM_CODE } from '../../utils/constant';
-// import NotificationService from 'src/services/notification_service';
+import { EmblemAttachedData } from 'src/typings/worker';
 
-interface Data {
-    user_id: string;
-    emblem_code: string;
-}
-
-export default async ({ data }: { data: Data }): Promise<void> => {
+export default async ({ data }: { data: EmblemAttachedData }): Promise<void> => {
     try {
         const userEmblemRepo = new UserEmblemRepository();
         if (data.emblem_code != EMBLEM_CODE.CORONA_HERO) {

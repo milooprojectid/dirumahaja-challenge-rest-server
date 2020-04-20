@@ -19,6 +19,7 @@ import LogRepository from '../repositories/log_repo';
 
 import Worker from '../jobs';
 import { logListOutput } from '../utils/transformer';
+import { UserCheckedInData } from 'src/typings/worker';
 
 export default class SessionController extends BaseController {
     public constructor() {
@@ -52,7 +53,7 @@ export default class SessionController extends BaseController {
             }
 
             /** dispatch handler */
-            await Worker.dispatch(Worker.Job.USER_CHECKIN, {
+            await Worker.dispatch<UserCheckedInData>(Worker.Job.USER_CHECKIN, {
                 session,
                 log: { coordinate: body.coordinate, next_log: body.next_checkin },
                 lose: !isValid
