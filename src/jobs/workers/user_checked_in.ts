@@ -1,17 +1,8 @@
-import { Session } from 'src/typings/models';
 import { DBContext } from 'tymon';
 import SessionService from '../../services/session_service';
+import { UserCheckedInData } from 'src/typings/worker';
 
-interface Data {
-    session: Session;
-    log: {
-        coordinate: string;
-        next_log: string;
-    };
-    lose: boolean;
-}
-
-export default async ({ data }: { data: Data }): Promise<void> => {
+export default async ({ data }: { data: UserCheckedInData }): Promise<void> => {
     try {
         await DBContext.startTransaction();
 

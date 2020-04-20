@@ -1,14 +1,9 @@
 import axios from 'axios';
-import { User } from 'src/typings/models';
 import UserService from '../../services/user_service';
 import UserRepository from '../../repositories/user_repo';
+import { UserRegisteredData } from 'src/typings/worker';
 
-interface Data {
-    user: User;
-    challenger_id: string | null;
-}
-
-export default async ({ data }: { data: Data }): Promise<void> => {
+export default async ({ data }: { data: UserRegisteredData }): Promise<void> => {
     try {
         const userRepo = new UserRepository();
 

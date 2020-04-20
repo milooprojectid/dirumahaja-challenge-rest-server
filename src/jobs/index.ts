@@ -35,7 +35,7 @@ export const initialize = async ({ connection_string }: { connection_string: str
     };
 };
 
-export const dispatch = async (job: Job, data?: any): Promise<void> => {
+export const dispatch = async <Data = any>(job: Job, data: Data): Promise<void> => {
     if (!instance) {
         throw new Error('Job not initialized');
     }
