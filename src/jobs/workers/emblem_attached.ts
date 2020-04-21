@@ -1,7 +1,7 @@
 import UserEmblemRepository from '../../repositories/user_emblem_repo';
 import { EMBLEM_CODE } from '../../utils/constant';
 import { EmblemAttachedData } from 'src/typings/worker';
-import EmblemService from 'src/services/emblem_service';
+import EmblemService from '../../services/emblem_service';
 import NotificationService from 'src/services/notification_service';
 
 export default async ({ data }: { data: EmblemAttachedData }): Promise<void> => {
