@@ -1,7 +1,7 @@
 import UserEmblemRepository from '../repositories/user_emblem_repo';
 import Worker from '../jobs';
 import { EmblemAttachedData } from 'src/typings/worker';
-import { EMBLEM_CODE } from 'src/utils/constant';
+import { EMBLEM_CODE } from '../utils/constant';
 
 export default class EmblemService {
     public static async attach(userId: string, emblemCode: EMBLEM_CODE, active: boolean = false): Promise<void> {

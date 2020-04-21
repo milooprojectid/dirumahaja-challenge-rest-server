@@ -3,8 +3,8 @@ import NotificationRepository from '../repositories/notification_repo';
 import UserService from './user_service';
 import { User } from 'src/typings/models';
 import { Covid19Data } from 'src/typings/common';
-import { EMBLEM_CODE, ICON } from 'src/utils/constant';
-import EmblemRepository from 'src/repositories/emblem_repo';
+import { EMBLEM_CODE, ICON } from '../utils/constant';
+import EmblemRepository from '../repositories/emblem_repo';
 
 export default class NotificationService {
     public static async sendLoseNotification(userId: string): Promise<void> {
