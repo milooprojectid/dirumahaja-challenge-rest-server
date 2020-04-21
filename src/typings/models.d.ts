@@ -70,3 +70,10 @@ export interface Punishment extends Model {
     text: string;
     img_url: string;
 }
+
+export interface Admin extends Model {
+    name: string;
+    email: string;
+    username: string;
+    password: string;
+}
