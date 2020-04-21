@@ -7,13 +7,11 @@ module.exports = {
             {
                 name: 'Archie',
                 username: 'archisdi',
-                email: null,
                 password: bcrypt.hashSync('archisdi')
             },
             {
                 name: 'Sukma',
                 username: 'sukma',
-                email: null,
                 password: bcrypt.hashSync('sukma')
             }
         ];

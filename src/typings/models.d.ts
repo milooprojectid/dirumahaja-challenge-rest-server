@@ -76,4 +76,5 @@ export interface Admin extends Model {
     email: string;
     username: string;
     password: string;
+    refresh_token: string;
 }

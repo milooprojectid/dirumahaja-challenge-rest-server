@@ -10,6 +10,6 @@ export default class AdminAuthController extends BaseController {
     }
 
     public setRoutes(): void {
-        this.addRoute('post', '/login', this.login);
+        this.addRoute('post', '/auth', this.login);
     }
 }

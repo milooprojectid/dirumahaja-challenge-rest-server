@@ -25,6 +25,10 @@ export default function (sequelize: any, dataTypes: any): any {
                 type: dataTypes.STRING(255),
                 allowNull: false
             },
+            refresh_token: {
+                type: dataTypes.STRING(255),
+                allowNull: true
+            },
             created_at: {
                 type: dataTypes.DATE,
                 allowNull: true
