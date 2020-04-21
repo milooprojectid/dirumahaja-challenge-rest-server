@@ -1,5 +1,5 @@
 import { Session, User } from './models';
-import { EMBLEM_CODE } from 'src/utils/constant';
+import { EMBLEM_CODE } from '../utils/constant';
 
 export interface EmblemAttachedData {
     user_id: string;
