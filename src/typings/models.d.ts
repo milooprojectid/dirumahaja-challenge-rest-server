@@ -11,6 +11,9 @@ export interface Coordinate {
 }
 
 export interface User extends Model {
+    name: string;
+    phone: string;
+    email: string;
     username: string;
     age: number | null;
     gender: string | null;
@@ -31,12 +34,16 @@ export interface Session extends Model {
     end_time: string | null;
     next_log: string | null;
     punishment: string | null;
+
+    user?: User;
 }
 
 export interface Log extends Model {
     session_id: string;
     coordinate: Coordinate;
     status: number;
+
+    session?: Session;
 }
 
 export interface Relation extends Model {
@@ -69,4 +76,12 @@ export interface Punishment extends Model {
     name: string;
     text: string;
     img_url: string;
+}
+
+export interface Admin extends Model {
+    name: string;
+    email: string;
+    username: string;
+    password: string;
+    refresh_token: string;
 }
