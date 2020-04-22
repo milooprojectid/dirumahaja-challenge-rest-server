@@ -48,6 +48,12 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
             per_page: Joi.number().positive().default(10),
             sort: Joi.string().default('-created_at')
         }).required()
+    }),
+    adminAuth: Joi.object({
+        body: Joi.object({
+            username: Joi.string().min(5).max(25).required(),
+            password: Joi.string().required()
+        }).required()
     })
 };
 
