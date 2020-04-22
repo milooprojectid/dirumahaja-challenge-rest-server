@@ -86,3 +86,38 @@ export const logListOutput = (logs: Log[]): Partial<Log>[] => {
         created_at: log.created_at
     }));
 };
+
+export const userListOutput = (users: User[]): Partial<User>[] => {
+    return users.map((user): any => ({
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        age: user.age
+    }));
+};
+
+export const userDetailOutput = (user: User, logs: Log[], relations: Relation[]): any => {
+    return {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        age: user.age,
+        coordinate: [...user.coordinate.coordinates],
+        location_name: user.location_name,
+        logs: logs.map((log): any => ({
+            id: log.id,
+            coordinate: [...log.coordinate.coordinates],
+            created_at: log.created_at
+        })),
+        relations: relations.map((relation): any => ({
+            id: relation.challenger?.id,
+            name: relation.challenger?.name,
+            username: relation.challenger?.username
+        })),
+        created_at: user.created_at
+    };
+};
