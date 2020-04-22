@@ -7,6 +7,7 @@ import UserRepository from '../../repositories/user_repo';
 import Validator from '../../middlewares/request_validator';
 import { userListOutput, userDetailOutput } from '../../utils/transformer';
 import LogRepository from '../../repositories/log_repo';
+import RelationRepository from '../../repositories/relation_repo';
 
 const filterUsers = async (name: string): Promise<any> => {
     const db = await DBContext.getInstance();
@@ -53,17 +54,21 @@ export default class AdminUserController extends BaseController {
         const { params } = data;
         const userRepo = new UserRepository(context);
         const logRepo = new LogRepository(context);
+        const relationRepo = new RelationRepository(context);
 
         const user = await userRepo.findOne({ id: params.id });
         if (!user) {
             throw HttpError.NotFound('USER_NOT_FOUND');
         }
 
-        const logs = await logRepo.getAllUserLogs(user.id);
+        const [logs, relations] = await Promise.all([
+            logRepo.getAllUserLogs(user.id),
+            relationRepo.getLessDetailedRelations(user.id)
+        ]);
 
         return {
             message: 'user detail retrieved',
-            data: userDetailOutput(user, logs)
+            data: userDetailOutput(user, logs, relations)
         };
     }
 

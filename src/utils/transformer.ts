@@ -98,7 +98,7 @@ export const userListOutput = (users: User[]): Partial<User>[] => {
     }));
 };
 
-export const userDetailOutput = (user: User, logs: Log[]): any => {
+export const userDetailOutput = (user: User, logs: Log[], relations: Relation[]): any => {
     return {
         id: user.id,
         name: user.name,
@@ -112,6 +112,11 @@ export const userDetailOutput = (user: User, logs: Log[]): any => {
             id: log.id,
             coordinate: [...log.coordinate.coordinates],
             created_at: log.created_at
+        })),
+        relations: relations.map((relation): any => ({
+            id: relation.challenger?.id,
+            name: relation.challenger?.name,
+            username: relation.challenger?.username
         })),
         created_at: user.created_at
     };
