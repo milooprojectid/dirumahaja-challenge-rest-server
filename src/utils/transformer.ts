@@ -97,3 +97,22 @@ export const userListOutput = (users: User[]): Partial<User>[] => {
         age: user.age
     }));
 };
+
+export const userDetailOutput = (user: User, logs: Log[]): any => {
+    return {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        age: user.age,
+        coordinate: [...user.coordinate.coordinates],
+        location_name: user.location_name,
+        logs: logs.map((log): any => ({
+            id: log.id,
+            coordinate: [...log.coordinate.coordinates],
+            created_at: log.created_at
+        })),
+        created_at: user.created_at
+    };
+};

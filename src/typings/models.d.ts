@@ -34,12 +34,16 @@ export interface Session extends Model {
     end_time: string | null;
     next_log: string | null;
     punishment: string | null;
+
+    user?: User;
 }
 
 export interface Log extends Model {
     session_id: string;
     coordinate: Coordinate;
     status: number;
+
+    session?: Session;
 }
 
 export interface Relation extends Model {
