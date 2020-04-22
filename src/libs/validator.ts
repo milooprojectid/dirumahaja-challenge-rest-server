@@ -4,6 +4,12 @@ import { COMMON_ERRORS } from '../utils/constant';
 
 const COOR_REGEX = /^([-+]?)([\d]{1,2})(((\.)(\d+)(,)))(\s*)(([-+]?)([\d]{1,3})((\.)(\d+))?)$/;
 
+const PAGINATION = {
+    page: Joi.number().positive().default(1),
+    per_page: Joi.number().positive().default(10),
+    sort: Joi.string().default('-created_at')
+};
+
 const schemas: { [s: string]: Joi.ObjectSchema } = {
     register: Joi.object({
         body: Joi.object({
@@ -44,15 +50,19 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
     }),
     logs: Joi.object({
         query: Joi.object({
-            page: Joi.number().positive().default(1),
-            per_page: Joi.number().positive().default(10),
-            sort: Joi.string().default('-created_at')
+            ...PAGINATION
         }).required()
     }),
     adminAuth: Joi.object({
         body: Joi.object({
             username: Joi.string().min(5).max(25).required(),
             password: Joi.string().required()
+        }).required()
+    }),
+    userList: Joi.object({
+        query: Joi.object({
+            ...PAGINATION,
+            name: Joi.string().optional().allow(null, '')
         }).required()
     })
 };

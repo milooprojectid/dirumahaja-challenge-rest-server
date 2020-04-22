@@ -22,7 +22,7 @@ export default class AdminDashboardController extends BaseController {
         ]);
 
         return {
-            message: 'dashboard data retrueved',
+            message: 'dashboard data retrieved',
             data: {
                 total_user: totalUser,
                 age: ageCounter,
