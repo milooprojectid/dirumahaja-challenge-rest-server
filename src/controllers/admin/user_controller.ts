@@ -35,41 +35,55 @@ export default class AdminUserController extends BaseController {
     }
 
     public async userList(data: IData, context: IContext): Promise<IHandlerOutput> {
-        const { query } = data;
-        const userRepo = new UserRepository(context);
+        try {
+            const { query } = data;
+            const userRepo = new UserRepository(context);
 
-        const filter = await filterUsers(query.name);
-        const users = await userRepo.paginate(filter, { page: query.page, per_page: query.per_page, sort: query.sort });
+            const filter = await filterUsers(query.name);
+            const users = await userRepo.paginate(filter, {
+                page: query.page,
+                per_page: query.per_page,
+                sort: query.sort
+            });
 
-        return {
-            message: 'user list retrieved',
-            data: {
-                users: userListOutput(users.data),
-                pagination: users.meta
-            }
-        };
+            return {
+                message: 'user list retrieved',
+                data: {
+                    users: userListOutput(users.data),
+                    pagination: users.meta
+                }
+            };
+        } catch (err) {
+            if (err.status) throw err;
+            throw HttpError.InternalServerError(err.message);
+        }
     }
 
     public async userDetail(data: IData, context: IContext): Promise<IHandlerOutput> {
-        const { params } = data;
-        const userRepo = new UserRepository(context);
-        const logRepo = new LogRepository(context);
-        const relationRepo = new RelationRepository(context);
+        try {
+            const { params } = data;
+            const userRepo = new UserRepository(context);
+            const logRepo = new LogRepository(context);
+            const relationRepo = new RelationRepository(context);
 
-        const user = await userRepo.findOne({ id: params.id });
-        if (!user) {
-            throw HttpError.NotFound('USER_NOT_FOUND');
+            const user = await userRepo.findOne({ id: params.id });
+            if (!user) {
+                throw HttpError.NotFound('USER_NOT_FOUND');
+            }
+
+            const [logs, relations] = await Promise.all([
+                logRepo.getAllUserLogs(user.id),
+                relationRepo.getLessDetailedRelations(user.id)
+            ]);
+
+            return {
+                message: 'user detail retrieved',
+                data: userDetailOutput(user, logs, relations)
+            };
+        } catch (err) {
+            if (err.status) throw err;
+            throw HttpError.InternalServerError(err.message);
         }
-
-        const [logs, relations] = await Promise.all([
-            logRepo.getAllUserLogs(user.id),
-            relationRepo.getLessDetailedRelations(user.id)
-        ]);
-
-        return {
-            message: 'user detail retrieved',
-            data: userDetailOutput(user, logs, relations)
-        };
     }
 
     public setRoutes(): void {
