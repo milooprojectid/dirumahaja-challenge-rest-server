@@ -42,4 +42,18 @@ export default class RelationRepository extends SQLRepo<Relation> {
             // order: [order]
         });
     }
+
+    /** LMAOOO */
+    public async getLessDetailedRelations(userId: string): Promise<any[]> {
+        const db = await this.getDbInstance();
+        return db[this.model].findAll({
+            where: {
+                user_id: userId
+            },
+            include: {
+                model: db.User,
+                as: 'challenger'
+            }
+        });
+    }
 }

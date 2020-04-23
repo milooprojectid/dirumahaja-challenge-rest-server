@@ -13,7 +13,6 @@ import LogRepository from '../repositories/log_repo';
 import RelationRepository from '../repositories/relation_repo';
 import EmblemService from './emblem_service';
 import NotificationService from './notification_service';
-import UserRepository from 'src/repositories/user_repo';
 
 export default class SessionService {
     public static async initializeNewSession(userId: string): Promise<void> {
