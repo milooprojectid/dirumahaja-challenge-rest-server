@@ -21,6 +21,8 @@ export default class AuthController extends BaseController {
             const { body }: RegisterPayload = data;
             const userRepo = new UserRepository();
 
+            // TODO: CHECK IF ALREADY REGISTERED AND ADD MIDDLEWARE
+
             /** check id uid or username already exist */
             const [userExsist, usernameExsist] = await Promise.all([
                 userRepo.findOne({ id: body.uid }),
@@ -61,22 +63,17 @@ export default class AuthController extends BaseController {
     }
 
     public async checkUsernameAvailability(data: IData, context: IContext): Promise<IHandlerOutput> {
-        try {
-            const { body }: RegisterPayload = data;
-            const userRepo = new UserRepository();
+        const { body }: RegisterPayload = data;
+        const userRepo = new UserRepository();
 
-            const userExist = await userRepo.findOne({ username: body.username });
+        const userExist = await userRepo.findOne({ username: body.username });
 
-            return {
-                message: 'check username success',
-                data: {
-                    is_exist: !!userExist
-                }
-            };
-        } catch (err) {
-            if (err.status) throw err;
-            throw HttpError.InternalServerError(err.message);
-        }
+        return {
+            message: 'check username success',
+            data: {
+                is_exist: !!userExist
+            }
+        };
     }
 
     public setRoutes(): void {
