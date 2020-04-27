@@ -1,8 +1,8 @@
-import { HttpError, DBContext } from 'tymon';
+import { HttpError, DBContext, FirebaseContext } from 'tymon';
 
 import Validator from '../middlewares/request_validator';
 import BaseController from './base/base_controller';
-import { IContext, IData, IHandlerOutput } from '../typings/common';
+import { IContext, IData, IHandlerOutput, IFirebaseToken } from '../typings/common';
 import { RegisterPayload } from 'src/typings/method';
 import { userCreatePayload } from '../utils/transformer';
 import SessionService from '../services/session_service';

@@ -3,11 +3,17 @@ import { Session, UserEmblem, Relation, User } from 'src/typings/models';
 import { timestamp, parseCoordinate } from './helpers';
 import { SESSION_STATUS, EMBLEM_CODE } from './constant';
 
-export const userCreatePayload = ({ body: data }: RegisterPayload): Partial<User> => {
+export const userCreatePayload = (
+    { body: data }: RegisterPayload,
+    optional?: { name: string; phone: string; email: string }
+): Partial<User> => {
     const [lat, lng] = parseCoordinate(data.coordinate);
 
     return {
         id: data.uid,
+        name: optional?.name || null,
+        phone: optional?.phone || null,
+        email: optional?.email || null,
         username: data.username,
         age: data.age,
         gender: data.gender,

@@ -3,8 +3,6 @@ import * as axios from 'axios';
 
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
 import Validator from '../middlewares/request_validator';
-import BasicAuthMiddleware from '../middlewares/basic';
-import FirebaseAuthMiddleware from '../middlewares/firebase';
 import UserRepository from '../repositories/user_repo';
 import RelationRepository from '../repositories/relation_repo';
 import UserEmblemRepository from '../repositories/user_emblem_repo';
@@ -130,15 +128,9 @@ export default class ProfileController extends BaseController {
     }
 
     protected setRoutes(): void {
-        this.addRoute('get', '/', this.getProfile, [BasicAuthMiddleware, Validator('profile')]);
-        this.addRoute('get', '/relation', this.getRelations, [BasicAuthMiddleware, Validator('profile')]);
-        this.addRoute('get', '/notification', this.getNotification, BasicAuthMiddleware);
-        this.addRoute('get', '/covid', this.getCovidData, BasicAuthMiddleware);
-
-        /** v2 */
-        this.addRoute('get', '/v2/', this.getProfile, [FirebaseAuthMiddleware, Validator('profile')]);
-        this.addRoute('get', '/v2/relation', this.getRelations, [FirebaseAuthMiddleware, Validator('profile')]);
-        this.addRoute('get', '/v2/notification', this.getNotification, FirebaseAuthMiddleware);
-        this.addRoute('get', '/v2/covid', this.getCovidData, FirebaseAuthMiddleware);
+        this.addRoute('get', '/', this.getProfile, Validator('profile'));
+        this.addRoute('get', '/relation', this.getRelations, Validator('profile'));
+        this.addRoute('get', '/notification', this.getNotification);
+        this.addRoute('get', '/covid', this.getCovidData);
     }
 }

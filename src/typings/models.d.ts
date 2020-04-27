@@ -11,6 +11,9 @@ export interface Coordinate {
 }
 
 export interface User extends Model {
+    name: string | null;
+    email: string | null;
+    phone: string | null;
     username: string;
     age: number | null;
     gender: string | null;

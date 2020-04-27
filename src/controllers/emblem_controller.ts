@@ -2,18 +2,12 @@ import { HttpError } from 'tymon';
 
 import BaseController from './base/base_controller';
 import Validator from '../middlewares/request_validator';
-import AuthMiddleware from '../middlewares/basic';
 import UserEmblemRepository from '../repositories/user_emblem_repo';
 import EmblemRepository from '../repositories/emblem_repo';
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
 import UserService from '../services/user_service';
 
 export default class EmblemContoller extends BaseController {
-    public constructor() {
-        super();
-        this.setMiddleware(AuthMiddleware);
-    }
-
     public async getEmblems(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
             const emblemRepo = new EmblemRepository();

@@ -4,7 +4,6 @@ import { getDistance } from 'geolib';
 
 import Validator from '../middlewares/request_validator';
 import BaseController from './base/base_controller';
-import AuthMiddleware from '../middlewares/basic';
 import { IContext, IData, IHandlerOutput } from '../typings/common';
 import { CheckinPayload, SetSessionPunishmentPayload } from 'src/typings/method';
 import SessionService from '../services/session_service';
@@ -19,11 +18,6 @@ import SessionRepository from '../repositories/session_repo';
 import Worker from '../jobs';
 
 export default class SessionController extends BaseController {
-    public constructor() {
-        super();
-        this.setMiddleware(AuthMiddleware);
-    }
-
     public async checkin(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
             const { body }: CheckinPayload = data;
@@ -148,7 +142,7 @@ export default class SessionController extends BaseController {
     public setRoutes(): void {
         this.addRoute('post', '/checkin', this.checkin, Validator('checkin'));
         this.addRoute('get', '/punishments', this.getPunishments);
-        this.addRoute('post', '/punishments', this.setSessionPunishment, Validator('setPunishment'));
+        this.addRoute('post', '/punishments', this.setSessionPunishment);
         this.addRoute('post', '/restart', this.reInitiateSession);
     }
 }

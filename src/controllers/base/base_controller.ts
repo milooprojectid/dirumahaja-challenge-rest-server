@@ -9,9 +9,13 @@ export default class BaseController {
     private routes: Router;
     private middlewares: RequestHandler[];
 
-    public constructor() {
+    public constructor(middlewares?: MiddleWare) {
         this.routes = Router({ mergeParams: true });
-        this.middlewares = [];
+        if (middlewares) {
+            this.middlewares = middlewares instanceof Array ? middlewares : [middlewares];
+        } else {
+            this.middlewares = [];
+        }
     }
 
     protected setMiddleware(middleware: MiddleWare): void {

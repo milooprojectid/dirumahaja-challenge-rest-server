@@ -7,6 +7,9 @@ export interface RegisterPayload {
         coordinate: string;
         challenger: string;
         location_name: string;
+        phone?: string;
+        email?: string;
+        name?: string;
     };
 }
 

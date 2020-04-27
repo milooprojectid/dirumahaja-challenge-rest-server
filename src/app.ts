@@ -17,6 +17,8 @@ import RateLimiter from './middlewares/ratelimiter';
 import EmblemContoller from './controllers/emblem_controller';
 
 import Worker from './jobs';
+import BasicAuthMiddleware from './middlewares/basic';
+import FirebaseAuthMiddleware from './middlewares/firebase';
 
 class App {
     private app: Application;
@@ -34,9 +36,14 @@ class App {
 
     private setupControllers(): void {
         this.app.use('/auth', new AuthController().getRoutes());
-        this.app.use('/profile', new ProfileController().getRoutes());
-        this.app.use('/session', new SessionController().getRoutes());
-        this.app.use('/emblem', new EmblemContoller().getRoutes());
+
+        this.app.use('/profile', new ProfileController(BasicAuthMiddleware).getRoutes());
+        this.app.use('/session', new SessionController(BasicAuthMiddleware).getRoutes());
+        this.app.use('/emblem', new EmblemContoller(BasicAuthMiddleware).getRoutes());
+
+        this.app.use('/v2/profile', new ProfileController(FirebaseAuthMiddleware).getRoutes());
+        this.app.use('/v2/session', new SessionController(FirebaseAuthMiddleware).getRoutes());
+        this.app.use('/v2/emblem', new EmblemContoller(FirebaseAuthMiddleware).getRoutes());
     }
 
     private setupModules(): void {
