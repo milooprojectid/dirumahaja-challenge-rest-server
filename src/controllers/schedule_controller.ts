@@ -1,7 +1,7 @@
 import { HttpError, DBContext } from 'tymon';
 
 import BaseController from './base/base_controller';
-import AuthMiddleware from '../middlewares/firebase';
+import AuthMiddleware from '../middlewares/basic';
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
 import MilooService from '../services/miloo_service';
 import * as bluebird from 'bluebird';

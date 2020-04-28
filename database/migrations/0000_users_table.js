@@ -10,6 +10,10 @@ module.exports = {
             allowNull: false,
             primaryKey: true
         },
+        uid: {
+            type: dataTypes.STRING(255),
+            allowNull: false
+        },
         name: {
             type: dataTypes.STRING(255),
             allowNull: true

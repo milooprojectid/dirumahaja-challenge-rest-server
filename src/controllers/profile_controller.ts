@@ -2,7 +2,7 @@ import { HttpError } from 'tymon';
 
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
 import Validator from '../middlewares/request_validator';
-import AuthMiddleware from '../middlewares/firebase';
+import AuthMiddleware from '../middlewares/basic';
 import UserRepository from '../repositories/user_repo';
 import RelationRepository from '../repositories/relation_repo';
 import UserEmblemRepository from '../repositories/user_emblem_repo';

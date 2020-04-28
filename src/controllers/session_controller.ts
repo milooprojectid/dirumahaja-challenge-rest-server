@@ -4,7 +4,7 @@ import { getDistance } from 'geolib';
 
 import Validator from '../middlewares/request_validator';
 import BaseController from './base/base_controller';
-import AuthMiddleware from '../middlewares/firebase';
+import AuthMiddleware from '../middlewares/basic';
 import { IContext, IData, IHandlerOutput } from '../typings/common';
 import { CheckinPayload, SetSessionPunishmentPayload } from 'src/typings/method';
 import SessionService from '../services/session_service';
