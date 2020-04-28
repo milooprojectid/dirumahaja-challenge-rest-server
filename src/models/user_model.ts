@@ -8,6 +8,22 @@ export default function (sequelize: any, dataTypes: any): any {
                 allowNull: false,
                 primaryKey: true
             },
+            uid: {
+                type: dataTypes.STRING(255),
+                allowNull: false
+            },
+            name: {
+                type: dataTypes.STRING(255),
+                allowNull: true
+            },
+            phone: {
+                type: dataTypes.STRING(255),
+                allowNull: true
+            },
+            email: {
+                type: dataTypes.STRING(255),
+                allowNull: true
+            },
             username: {
                 type: dataTypes.STRING(255),
                 allowNull: false,

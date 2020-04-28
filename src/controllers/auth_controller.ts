@@ -11,6 +11,7 @@ import EmblemService from '../services/emblem_service';
 import { EMBLEM_CODE } from '../utils/constant';
 import UserService from '../services/user_service';
 import Worker from '../jobs';
+import { UserRegisteredData } from 'src/typings/worker';
 
 export default class AuthController extends BaseController {
     public async register(data: IData, context: IContext): Promise<IHandlerOutput> {
@@ -19,6 +20,8 @@ export default class AuthController extends BaseController {
 
             const { body }: RegisterPayload = data;
             const userRepo = new UserRepository();
+
+            // TODO: CHECK IF ALREADY REGISTERED AND ADD MIDDLEWARE
 
             /** check id uid or username already exist */
             const [userExsist, usernameExsist] = await Promise.all([
@@ -34,22 +37,18 @@ export default class AuthController extends BaseController {
             const payload = userCreatePayload(data);
             const user = await userRepo.create(payload);
 
-            /** generate relation */
-            if (body.challenger && body.challenger != body.username) {
-                const challenger = await userRepo.findOne({ username: body.challenger });
-                if (!challenger) {
-                    throw HttpError.NotFound(null, 'CHALLENGER_NOT_FOUND');
-                }
-                await UserService.pair(user.id, challenger.id);
-            }
-
             /** initialize session and generate user emblem */
             await Promise.all([
                 SessionService.initializeNewSession(body.uid),
                 EmblemService.attach(user.id, EMBLEM_CODE.HERO_ONE, true)
             ]);
 
-            await Worker.dispatch(Worker.Job.USER_REGISTERED, { user });
+            /** dispatch async job */
+            await Worker.dispatch<UserRegisteredData>(Worker.Job.USER_REGISTERED, {
+                user,
+                challenger_id: body.challenger
+            });
+
             await DBContext.commit();
 
             return {
@@ -64,22 +63,17 @@ export default class AuthController extends BaseController {
     }
 
     public async checkUsernameAvailability(data: IData, context: IContext): Promise<IHandlerOutput> {
-        try {
-            const { body }: RegisterPayload = data;
-            const userRepo = new UserRepository();
+        const { body }: RegisterPayload = data;
+        const userRepo = new UserRepository();
 
-            const userExist = await userRepo.findOne({ username: body.username });
+        const userExist = await userRepo.findOne({ username: body.username });
 
-            return {
-                message: 'check username success',
-                data: {
-                    is_exist: !!userExist
-                }
-            };
-        } catch (err) {
-            if (err.status) throw err;
-            throw HttpError.InternalServerError(err.message);
-        }
+        return {
+            message: 'check username success',
+            data: {
+                is_exist: !!userExist
+            }
+        };
     }
 
     public setRoutes(): void {

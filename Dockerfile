@@ -1,5 +1,5 @@
 # builder
-FROM node:10 as builder
+FROM node:12 as builder
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -17,7 +17,7 @@ RUN cp ./.env ./build
 RUN cp ./firebase-service-account.json ./build
 
 # release
-FROM node:10-alpine as release
+FROM node:12-alpine as release
 COPY --from=builder ./usr/src/app/build .
 
 EXPOSE 3020

@@ -1,5 +1,5 @@
 import { RegisterPayload } from 'src/typings/method';
-import { Session, UserEmblem, Relation, User } from 'src/typings/models';
+import { Session, UserEmblem, Relation, User, Log } from 'src/typings/models';
 import { timestamp, parseCoordinate } from './helpers';
 import { SESSION_STATUS, EMBLEM_CODE } from './constant';
 
@@ -81,4 +81,49 @@ export const relationsOutput = (relations: Relation[]): any[] => {
         emblem_img_url: item.challenger?.active_emblem?.emblem?.img_url,
         emblem_name: item.challenger?.active_emblem?.emblem?.name
     }));
+};
+
+export const logListOutput = (logs: Log[]): Partial<Log>[] => {
+    return logs.map((log): any => ({
+        id: log.id,
+        session_id: log.session_id,
+        coordinate: log.coordinate,
+        status: log.status,
+        created_at: log.created_at
+    }));
+};
+
+export const userListOutput = (users: User[]): Partial<User>[] => {
+    return users.map((user): any => ({
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        age: user.age
+    }));
+};
+
+export const userDetailOutput = (user: User, logs: Log[], relations: Relation[]): any => {
+    return {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        age: user.age,
+        coordinate: [...user.coordinate.coordinates],
+        location_name: user.location_name,
+        logs: logs.map((log): any => ({
+            id: log.id,
+            coordinate: [...log.coordinate.coordinates],
+            created_at: log.created_at
+        })),
+        relations: relations.map((relation): any => ({
+            id: relation.challenger?.id,
+            name: relation.challenger?.name,
+            username: relation.challenger?.username
+        })),
+        created_at: user.created_at
+    };
 };

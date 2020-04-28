@@ -1,14 +1,22 @@
 import axios from 'axios';
-import { User } from 'src/typings/models';
+import UserService from '../../services/user_service';
+import UserRepository from '../../repositories/user_repo';
+import { UserRegisteredData } from 'src/typings/worker';
 
-interface Data {
-    user: User;
-}
-
-export default async ({ data }: { data: Data }): Promise<void> => {
+export default async ({ data }: { data: UserRegisteredData }): Promise<void> => {
     try {
-        const slackWebhook = String(process.env.SLACK_WEBHOOK_URL);
-        await axios.post(slackWebhook, {
+        const userRepo = new UserRepository();
+
+        /** generate relation */
+        if (data.challenger_id && data.challenger_id != data.user.username) {
+            const challenger = await userRepo.findOne({ username: data.challenger_id });
+            if (challenger) {
+                await UserService.pair(data.user, challenger);
+            }
+        }
+
+        /** send message to slack */
+        await axios.post(String(process.env.SLACK_WEBHOOK_URL), {
             fallback: '-',
             text: 'New user registered',
             color: '588da8',

@@ -1,6 +1,6 @@
 export default function (sequelize: any, dataTypes: any): any {
-    const log = sequelize.define(
-        'Log',
+    const admin = sequelize.define(
+        'Admin',
         {
             id: {
                 type: dataTypes.STRING,
@@ -8,18 +8,26 @@ export default function (sequelize: any, dataTypes: any): any {
                 allowNull: false,
                 primaryKey: true
             },
-            session_id: {
+            name: {
+                type: dataTypes.STRING(255),
+                allowNull: true
+            },
+            email: {
+                type: dataTypes.STRING(255),
+                allowNull: true
+            },
+            username: {
+                type: dataTypes.STRING(255),
+                allowNull: false,
+                unique: true
+            },
+            password: {
                 type: dataTypes.STRING(255),
                 allowNull: false
             },
-            coordinate: {
-                type: dataTypes.GEOMETRY('POINT'),
-                allowNull: false
-            },
-            status: {
-                type: dataTypes.INTEGER,
-                defaultValue: 20,
-                allowNull: false
+            refresh_token: {
+                type: dataTypes.STRING(255),
+                allowNull: true
             },
             created_at: {
                 type: dataTypes.DATE,
@@ -35,20 +43,12 @@ export default function (sequelize: any, dataTypes: any): any {
             }
         },
         {
-            tableName: 'logs',
+            tableName: 'admins',
             freezeTableName: true,
             underscored: true,
             paranoid: true /** Soft deletes */
         }
     );
 
-    log.associate = (models: any): void => {
-        log.belongsTo(models.Session, {
-            foreignKey: 'session_id',
-            targetKey: 'id',
-            as: 'session'
-        });
-    };
-
-    return log;
+    return admin;
 }

@@ -1,4 +1,4 @@
-import { HttpError } from 'tymon';
+import { HttpError, DBContext } from 'tymon';
 
 import BaseController from './base/base_controller';
 import Validator from '../middlewares/request_validator';
@@ -9,43 +9,35 @@ import UserService from '../services/user_service';
 
 export default class EmblemContoller extends BaseController {
     public async getEmblems(data: IData, context: IContext): Promise<IHandlerOutput> {
-        try {
-            const emblemRepo = new EmblemRepository();
-            const emblems = await emblemRepo.findAll({}, 'id', ['code', 'name', 'img_url']);
+        const emblemRepo = new EmblemRepository();
+        const emblems = await emblemRepo.findAll({}, 'id', ['code', 'name', 'img_url']);
 
-            return {
-                message: 'all emblem retrieved',
-                data: emblems
-            };
-        } catch (err) {
-            if (err.status) throw err;
-            throw HttpError.InternalServerError(err.message);
-        }
+        return {
+            message: 'all emblem retrieved',
+            data: emblems
+        };
     }
 
     public async getMyEmblems(data: IData, context: IContext): Promise<IHandlerOutput> {
-        try {
-            const userEmblemRepo = new UserEmblemRepository();
-            const emblems = await userEmblemRepo.getAllUserEmblem(context.user_id);
+        const userEmblemRepo = new UserEmblemRepository();
+        const emblems = await userEmblemRepo.getAllUserEmblem(context.user_id);
 
-            return {
-                message: 'user emblem retrieved',
-                data: emblems.map((item): any => ({
-                    id: item.id,
-                    is_active: item.is_active,
-                    code: item.emblem?.code,
-                    name: item.emblem?.name,
-                    img_url: item.emblem?.img_url
-                }))
-            };
-        } catch (err) {
-            if (err.status) throw err;
-            throw HttpError.InternalServerError(err.message);
-        }
+        return {
+            message: 'user emblem retrieved',
+            data: emblems.map((item): any => ({
+                id: item.id,
+                is_active: item.is_active,
+                code: item.emblem?.code,
+                name: item.emblem?.name,
+                img_url: item.emblem?.img_url
+            }))
+        };
     }
 
     public async setCurrentEmblem(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
+            await DBContext.startTransaction();
+
             const { params } = data;
             const userEmblemRepo = new UserEmblemRepository();
 
@@ -60,13 +52,15 @@ export default class EmblemContoller extends BaseController {
                 UserService.bustProfileCache(context.user_id)
             ]);
 
+            await DBContext.commit();
+
             return {
                 message: 'user emblem changed',
                 data: null
             };
         } catch (err) {
-            if (err.status) throw err;
-            throw HttpError.InternalServerError(err.message);
+            await DBContext.rollback();
+            throw err;
         }
     }
 
