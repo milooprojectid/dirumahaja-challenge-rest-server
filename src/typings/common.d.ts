@@ -85,3 +85,20 @@ export interface IFirebaseToken {
     iat: number;
     exp: number;
 }
+
+export interface IAllNotificationPayload {
+    notification?: {
+        title: string;
+        body?: string;
+    };
+    data?: { [s: string]: string };
+    condition: string;
+}
+
+export interface Covid19Data {
+    confirmed: number;
+    recovered: number;
+    deceased: number;
+    suspected: number;
+    negative: number;
+}
