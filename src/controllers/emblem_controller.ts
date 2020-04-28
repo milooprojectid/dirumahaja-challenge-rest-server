@@ -1,4 +1,4 @@
-import { HttpError } from 'tymon';
+import { HttpError, DBContext } from 'tymon';
 
 import BaseController from './base/base_controller';
 import Validator from '../middlewares/request_validator';
@@ -8,7 +8,7 @@ import EmblemRepository from '../repositories/emblem_repo';
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
 import UserService from '../services/user_service';
 
-export default class EmblemContoller extends BaseController {
+export default class EmblemController extends BaseController {
     public constructor() {
         super();
         this.setMiddleware(AuthMiddleware);
@@ -52,6 +52,8 @@ export default class EmblemContoller extends BaseController {
 
     public async setCurrentEmblem(data: IData, context: IContext): Promise<IHandlerOutput> {
         try {
+            await DBContext.startTransaction();
+
             const { params } = data;
             const userEmblemRepo = new UserEmblemRepository();
 
@@ -66,11 +68,14 @@ export default class EmblemContoller extends BaseController {
                 UserService.bustProfileCache(context.user_id)
             ]);
 
+            await DBContext.commit();
+
             return {
                 message: 'user emblem changed',
                 data: null
             };
         } catch (err) {
+            await DBContext.rollback();
             if (err.status) throw err;
             throw HttpError.InternalServerError(err.message);
         }

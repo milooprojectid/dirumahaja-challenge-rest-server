@@ -8,14 +8,15 @@ import * as cors from 'cors';
 import AuthController from './controllers/auth_controller';
 import ProfileController from './controllers/profile_controller';
 import SessionController from './controllers/session_controller';
+import EmblemController from './controllers/emblem_controller';
+import ScheduleController from './controllers/schedule_controller';
+import AdminBaseController from './controllers/admin/admin_base_controller';
 
 import ExceptionHandler from './middlewares/exception';
 import NotFoundHandler from './middlewares/not_found';
 
 import ApiGuard from './middlewares/guard';
 import RateLimiter from './middlewares/ratelimiter';
-import EmblemContoller from './controllers/emblem_controller';
-
 import Worker from './jobs';
 
 class App {
@@ -33,10 +34,12 @@ class App {
     }
 
     private setupControllers(): void {
+        this.app.use('/admin', new AdminBaseController().getRoutes());
         this.app.use('/auth', new AuthController().getRoutes());
         this.app.use('/profile', new ProfileController().getRoutes());
         this.app.use('/session', new SessionController().getRoutes());
-        this.app.use('/emblem', new EmblemContoller().getRoutes());
+        this.app.use('/emblem', new EmblemController().getRoutes());
+        this.app.use('/schedule', new ScheduleController().getRoutes());
     }
 
     private setupModules(): void {

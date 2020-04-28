@@ -12,6 +12,7 @@ import SessionService from './session_service';
 import { EMBLEM_CODE, CACHE_TTL } from '../utils/constant';
 import EmblemService from './emblem_service';
 import NotificationService from './notification_service';
+import { RelationAddedData } from 'src/typings/worker';
 
 export default class UserService {
     public static async getById(userId: string): Promise<Complete<User>> {
@@ -41,32 +42,29 @@ export default class UserService {
         await redisRepo.delete(userId);
     }
 
-    public static async pair(userIdA: string, userIdB: string): Promise<void> {
+    public static async pair(userA: User, userB: User): Promise<void> {
         const relationRepo = new RelationRepository();
 
-        const payloadA = relationCreatepayload(userIdA, userIdB);
-        const payloadB = relationCreatepayload(userIdB, userIdA);
+        const payloadA = relationCreatepayload(userA.id, userB.id);
+        const payloadB = relationCreatepayload(userB.id, userA.id);
 
         await Promise.all([
             relationRepo.upsert(payloadA, payloadA),
-            relationRepo.upsert(payloadB, payloadB)
-            // this.addHealth(userIdB)
+            relationRepo.upsert(payloadB, payloadB),
+            this.addHealth(userB.id),
+            NotificationService.sendRelationNotification(userB, userA)
         ]);
 
-        await Worker.dispatch(Worker.Job.RELATION_ADDED, { user_id: userIdB });
+        await Worker.dispatch<RelationAddedData>(Worker.Job.RELATION_ADDED, { user_id: userB.id });
     }
 
-    public static async addHealth(userId: string, from: string | null = null): Promise<void> {
+    public static async addHealth(userId: string): Promise<void> {
         const sessionRepo = new SessionRepository();
+
         const session = await SessionService.getActiveSession(userId);
         const newHealth = session.health + 1;
 
-        let sendNotification;
-        if (from) {
-            sendNotification = NotificationService.sendHealthNotification(session.user_id, from);
-        }
-
-        await Promise.all([sessionRepo.update({ id: session.id }, { health: newHealth }), sendNotification]);
+        await Promise.all([sessionRepo.update({ id: session.id }, { health: newHealth })]);
 
         switch (newHealth) {
             case 3: {

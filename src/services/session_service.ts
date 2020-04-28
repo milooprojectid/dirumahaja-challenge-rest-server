@@ -55,21 +55,28 @@ export default class SessionService {
             payload.status = SESSION_STATUS.CLOSED;
             payload.end_time = timestamp();
 
-            /** give health to every friends */
-            await bluebird.all([
-                UserService.bustProfileCache(session.user_id),
-                NotificationService.sendLoseNotification(session.user_id)
-            ]);
-
             /** notification */
             const [user, relations] = await Promise.all([
                 UserService.getById(session.user_id),
                 relationRepo.findAll({ challenger_id: session.user_id })
             ]);
 
-            await bluebird.map(relations, (relation): any => UserService.addHealth(relation.user_id, user.username), {
-                concurrency: 5
-            });
+            /** give health to every friends */
+            await bluebird.all([
+                UserService.bustProfileCache(session.user_id),
+                NotificationService.sendLoseNotification(user.id)
+            ]);
+
+            await bluebird.map(
+                relations,
+                (relation): any =>
+                    UserService.addHealth(relation.user_id).then(
+                        (): Promise<void> => NotificationService.sendWinNotification(relation.user_id, user.id)
+                    ),
+                {
+                    concurrency: 5
+                }
+            );
         }
 
         const coordinate = parseCoordinate(log.coordinate);

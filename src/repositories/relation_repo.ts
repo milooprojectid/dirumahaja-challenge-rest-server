@@ -1,7 +1,6 @@
 import SQLRepo from './base/sql_repository';
 import { IContext } from 'src/typings/common';
 import { Relation } from '../typings/models';
-import { SESSION_STATUS } from '../utils/constant';
 
 export default class RelationRepository extends SQLRepo<Relation> {
     public constructor(context?: IContext) {
@@ -41,6 +40,20 @@ export default class RelationRepository extends SQLRepo<Relation> {
                 ]
             }
             // order: [order]
+        });
+    }
+
+    /** LMAOOO */
+    public async getLessDetailedRelations(userId: string): Promise<any[]> {
+        const db = await this.getDbInstance();
+        return db[this.model].findAll({
+            where: {
+                user_id: userId
+            },
+            include: {
+                model: db.User,
+                as: 'challenger'
+            }
         });
     }
 }

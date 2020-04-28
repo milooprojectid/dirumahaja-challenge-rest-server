@@ -1,6 +1,6 @@
 'use strict';
 
-const tableName = 'users';
+const tableName = 'admins';
 
 module.exports = {
     up: (queryInterface, dataTypes) => queryInterface.createTable(tableName, {
@@ -14,10 +14,6 @@ module.exports = {
             type: dataTypes.STRING(255),
             allowNull: true
         },
-        phone: {
-            type: dataTypes.STRING(255),
-            allowNull: true
-        },
         email: {
             type: dataTypes.STRING(255),
             allowNull: true
@@ -27,19 +23,11 @@ module.exports = {
             allowNull: false,
             unique: true
         },
-        age: {
-            type: dataTypes.INTEGER,
-            allowNull: true
-        },
-        gender: {
-            type: dataTypes.ENUM('f', 'm'),
-            allowNull: true
-        },
-        coordinate: {
-            type: dataTypes.GEOMETRY('POINT'),
+        password: {
+            type: dataTypes.STRING(255),
             allowNull: false
         },
-        location_name: {
+        refresh_token: {
             type: dataTypes.STRING(255),
             allowNull: true
         },

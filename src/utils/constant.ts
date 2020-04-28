@@ -30,3 +30,8 @@ export enum EMBLEM_CODE {
 export const MAX_HOME_RADIUS = 500;
 
 export const CACHE_TTL = 300; // seconds
+
+export const ICON = {
+    HAPPY: 'https://dirumahaja.miloo.id/assets/img/notification/notification_02.png',
+    SAD: 'https://dirumahaja.miloo.id/assets/img/notification/notification_01.png'
+};
