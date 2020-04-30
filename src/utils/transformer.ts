@@ -7,7 +7,7 @@ export const userCreatePayload = ({ body: data }: RegisterPayload): Partial<User
     const [lat, lng] = parseCoordinate(data.coordinate);
 
     return {
-        id: data.uid,
+        uid: data.uid,
         username: data.username,
         age: data.age,
         gender: data.gender,
