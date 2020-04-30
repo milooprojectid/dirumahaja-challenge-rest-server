@@ -13,7 +13,8 @@ const PAGINATION = {
 const schemas: { [s: string]: Joi.ObjectSchema } = {
     register: Joi.object({
         body: Joi.object({
-            uid: Joi.string().required(),
+            uid: Joi.string().allow(null, '').optional(),
+            id_token: Joi.string().required(),
             username: Joi.string().min(4).max(20).required(),
             email: Joi.string().max(50).optional().allow(null, ''),
             name: Joi.string().max(50).optional().allow(null, ''),
@@ -50,19 +51,6 @@ const schemas: { [s: string]: Joi.ObjectSchema } = {
         body: Joi.object({
             punishment: Joi.string().min(5).max(100).required()
         }).required()
-    }),
-    callbackRegister: Joi.object({
-        body: Joi.object({
-            username: Joi.string().min(4).max(20).required(),
-            email: Joi.string().max(50).optional().allow(null, ''),
-            name: Joi.string().max(50).optional().allow(null, ''),
-            phone: Joi.string().max(50).optional().allow(null, ''),
-            age: Joi.number().integer().positive().optional(),
-            gender: Joi.string().valid('m', 'f').optional(),
-            coordinate: Joi.string().regex(COOR_REGEX).required(),
-            challenger: Joi.string().max(255).optional().allow('', null),
-            location_name: Joi.string().max(50).optional().allow('', null)
-        })
     }),
     logs: Joi.object({
         query: Joi.object({

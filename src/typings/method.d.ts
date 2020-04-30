@@ -1,6 +1,7 @@
 export interface RegisterPayload {
     body: {
-        uid: string;
+        uid?: string;
+        id_token: string;
         username: string;
         age: number;
         gender: string;

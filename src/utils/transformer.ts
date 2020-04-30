@@ -2,6 +2,7 @@ import { RegisterPayload } from 'src/typings/method';
 import { Session, UserEmblem, Relation, User, Log } from 'src/typings/models';
 import { timestamp, parseCoordinate } from './helpers';
 import { SESSION_STATUS, EMBLEM_CODE } from './constant';
+import { IFirebaseToken } from 'src/typings/common';
 
 export const userCreatePayload = (
     { body: data }: RegisterPayload,
@@ -19,6 +20,16 @@ export const userCreatePayload = (
         gender: data.gender,
         coordinate: { type: 'Point', coordinates: [lat, lng] },
         location_name: data.location_name || null
+    };
+};
+
+export const userUpdatePayload = (data: User, firebaseUser: IFirebaseToken): Partial<User> => {
+    return {
+        uid: data.uid,
+        name: data.name,
+        phone: firebaseUser.phone_number || data.phone,
+        email: firebaseUser.email || data.email,
+        username: data.username
     };
 };
 
