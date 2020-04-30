@@ -25,7 +25,7 @@ export default class AuthController extends BaseController {
 
             /** check id uid or username already exist */
             const [userExsist, usernameExsist] = await Promise.all([
-                userRepo.findOne({ id: body.uid }),
+                userRepo.findOne({ uid: body.uid }),
                 userRepo.findOne({ username: body.username })
             ]);
 
