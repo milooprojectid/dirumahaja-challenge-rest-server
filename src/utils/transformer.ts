@@ -10,7 +10,7 @@ export const userCreatePayload = (
     const [lat, lng] = parseCoordinate(data.coordinate);
 
     return {
-        id: data.uid,
+        uid: data.uid,
         name: optional?.name || null,
         phone: optional?.phone || null,
         email: optional?.email || null,
