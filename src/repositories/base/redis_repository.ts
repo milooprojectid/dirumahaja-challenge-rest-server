@@ -17,7 +17,7 @@ export default class RedisRepo extends BaseRepository {
         return redisClient.get(`${this.model}-${key}`).then((res: any): any => JSON.parse(res));
     }
 
-    public async create(key: string, payload: any, expires?: number): Promise<void> {
+    public async create(key: string, payload: object, expires?: number): Promise<void> {
         const redisClient = RedisContext.getInstance();
         const cacheKey = `${this.model}-${key}`;
 

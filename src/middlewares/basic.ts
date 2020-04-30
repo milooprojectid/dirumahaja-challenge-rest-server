@@ -29,7 +29,7 @@ export default async (req: Request, res: Response, next: NextFunction): Promise<
     /** get from sql */
     if (!cache) {
         const userRepo = new UserRepository();
-        const user = await userRepo.findOne({ uid });
+        const user = await userRepo.findOne({ uid }, ['id']);
         if (!user) {
             return next(HttpError.NotAuthorized(COMMON_ERRORS.TOKEN_INVALID));
         }
