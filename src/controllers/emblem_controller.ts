@@ -2,7 +2,7 @@ import { HttpError, DBContext } from 'tymon';
 
 import BaseController from './base/base_controller';
 import Validator from '../middlewares/request_validator';
-import AuthMiddleware from '../middlewares/firebase';
+import AuthMiddleware from '../middlewares/basic';
 import UserEmblemRepository from '../repositories/user_emblem_repo';
 import EmblemRepository from '../repositories/emblem_repo';
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
@@ -15,39 +15,29 @@ export default class EmblemController extends BaseController {
     }
 
     public async getEmblems(data: IData, context: IContext): Promise<IHandlerOutput> {
-        try {
-            const emblemRepo = new EmblemRepository();
-            const emblems = await emblemRepo.findAll({}, 'id', ['code', 'name', 'img_url']);
+        const emblemRepo = new EmblemRepository();
+        const emblems = await emblemRepo.findAll({}, 'id', ['code', 'name', 'img_url']);
 
-            return {
-                message: 'all emblem retrieved',
-                data: emblems
-            };
-        } catch (err) {
-            if (err.status) throw err;
-            throw HttpError.InternalServerError(err.message);
-        }
+        return {
+            message: 'all emblem retrieved',
+            data: emblems
+        };
     }
 
     public async getMyEmblems(data: IData, context: IContext): Promise<IHandlerOutput> {
-        try {
-            const userEmblemRepo = new UserEmblemRepository();
-            const emblems = await userEmblemRepo.getAllUserEmblem(context.user_id);
+        const userEmblemRepo = new UserEmblemRepository();
+        const emblems = await userEmblemRepo.getAllUserEmblem(context.user_id);
 
-            return {
-                message: 'user emblem retrieved',
-                data: emblems.map((item): any => ({
-                    id: item.id,
-                    is_active: item.is_active,
-                    code: item.emblem?.code,
-                    name: item.emblem?.name,
-                    img_url: item.emblem?.img_url
-                }))
-            };
-        } catch (err) {
-            if (err.status) throw err;
-            throw HttpError.InternalServerError(err.message);
-        }
+        return {
+            message: 'user emblem retrieved',
+            data: emblems.map((item): any => ({
+                id: item.id,
+                is_active: item.is_active,
+                code: item.emblem?.code,
+                name: item.emblem?.name,
+                img_url: item.emblem?.img_url
+            }))
+        };
     }
 
     public async setCurrentEmblem(data: IData, context: IContext): Promise<IHandlerOutput> {
@@ -76,8 +66,7 @@ export default class EmblemController extends BaseController {
             };
         } catch (err) {
             await DBContext.rollback();
-            if (err.status) throw err;
-            throw HttpError.InternalServerError(err.message);
+            throw err;
         }
     }
 

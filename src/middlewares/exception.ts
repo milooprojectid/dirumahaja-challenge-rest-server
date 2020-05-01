@@ -14,7 +14,8 @@ export default (err: any, req: Request, res: Response, next: NextFunction): obje
             error_type: status === INTERNAL_SERVER_ERROR ? COMMON_ERRORS.SERVER_ERROR : name,
             error_message: message || null,
             error_data: data,
-            code: status
+            code: status,
+            stack
         }
     };
 

@@ -1,7 +1,7 @@
 import { HttpError, DBContext } from 'tymon';
 
 import BaseController from './base/base_controller';
-import AuthMiddleware from '../middlewares/firebase';
+import AuthMiddleware from '../middlewares/basic';
 import { IContext, IData, IHandlerOutput } from 'src/typings/common';
 import MilooService from '../services/miloo_service';
 import * as bluebird from 'bluebird';
@@ -15,18 +15,13 @@ export default class ScheduleController extends BaseController {
     }
 
     public async notifyCovid19(data: IData, context: IContext): Promise<IHandlerOutput> {
-        try {
-            const covid19Data = await MilooService.getCovid19Data(false);
-            await NotificationService.sendCovidNotification(covid19Data);
+        const covid19Data = await MilooService.getCovid19Data(false);
+        await NotificationService.sendCovidNotification(covid19Data);
 
-            return {
-                message: 'all user notified',
-                data: covid19Data
-            };
-        } catch (err) {
-            if (err.status) throw err;
-            throw HttpError.InternalServerError(err.message);
-        }
+        return {
+            message: 'all user notified',
+            data: covid19Data
+        };
     }
 
     protected setRoutes(): void {
